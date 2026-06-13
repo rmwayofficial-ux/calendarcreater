@@ -1,0 +1,339 @@
+:root {
+  --bg: #f6f1e8;
+  --panel: #fffdf9;
+  --line: #e4dac8;
+  --text: #5a5249;
+  --muted: #9a8f80;
+  --title: #5e7867;
+  --sat: #5b83a6;
+  --sun: #c96f6f;
+  --double: #e23b2e;
+  --circle: #2fa24c;
+  --triangle: #2c6fd6;
+  --cross: #1a1a1a;
+  --none: #b8ae9e;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', 'Yu Gothic', 'Meiryo', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.app {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 20px 16px 48px;
+}
+
+.topbar h1 {
+  font-size: 24px;
+  color: var(--title);
+  margin: 4px 0 2px;
+}
+.topbar .sub {
+  margin: 0 0 16px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.editor,
+.preview {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 16px;
+}
+
+/* 月ナビ */
+.monthnav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.monthnav button {
+  width: 40px;
+  height: 40px;
+  font-size: 16px;
+}
+.monthnav select {
+  height: 40px;
+}
+
+/* 入力 */
+.fields {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.fields label {
+  display: grid;
+  gap: 4px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.fields input {
+  height: 38px;
+  padding: 0 10px;
+  font-size: 15px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--text);
+}
+
+button,
+select {
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--text);
+  border-radius: 8px;
+  padding: 0 12px;
+  font-size: 14px;
+  cursor: pointer;
+}
+button:hover {
+  background: #f3efe6;
+}
+
+/* ツール */
+.tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.tools > button {
+  height: 38px;
+}
+.bulk {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  margin-left: auto;
+}
+.bulk select {
+  height: 38px;
+}
+.bulk button {
+  height: 38px;
+}
+@media (max-width: 480px) {
+  .bulk {
+    margin-left: 0;
+    width: 100%;
+  }
+  .bulk select {
+    flex: 1;
+  }
+}
+
+/* 編集グリッド */
+.grid {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.grid-head,
+.grid-row {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+}
+.grid-head .gh {
+  text-align: center;
+  font-weight: 700;
+  padding: 8px 0;
+  background: #efe7d7;
+  font-size: 14px;
+}
+.gh.sat {
+  color: var(--sat);
+}
+.gh.sun {
+  color: var(--sun);
+}
+
+.cell {
+  border-top: 1px solid var(--line);
+  border-left: 1px solid var(--line);
+  min-height: 104px;
+  padding: 3px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.grid-row .cell:first-child {
+  border-left: none;
+}
+.cell.empty {
+  background: #faf7f0;
+}
+.daynum {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  font-weight: 700;
+  font-size: 13px;
+  padding: 1px 3px;
+}
+.daynum.sat {
+  color: var(--sat);
+}
+.daynum.sun {
+  color: var(--sun);
+}
+.daynum em {
+  font-style: normal;
+  font-size: 9px;
+  color: var(--sun);
+}
+
+.slot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2px 6px;
+  height: 26px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: #faf7f0;
+  width: 100%;
+}
+.slot:hover {
+  background: #f0eadd;
+  border-color: var(--line);
+}
+.slot-label {
+  font-size: 10px;
+  color: var(--muted);
+}
+.slot-mark {
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1;
+}
+.mark-none .slot-mark {
+  color: #cfc6b6;
+}
+.mark-double .slot-mark {
+  color: var(--double);
+}
+.mark-circle .slot-mark {
+  color: var(--circle);
+}
+.mark-triangle .slot-mark {
+  color: var(--triangle);
+}
+.mark-cross .slot-mark {
+  color: var(--cross);
+}
+
+.note-input {
+  width: 100%;
+  margin-top: 1px;
+  padding: 3px 5px;
+  font-size: 11px;
+  line-height: 1.3;
+  font-family: inherit;
+  border: 1px dashed var(--line);
+  border-radius: 5px;
+  background: #fbf7f1;
+  color: #8e5f86;
+  resize: vertical;
+  min-height: 34px;
+}
+.note-input::placeholder {
+  color: #cabfb0;
+}
+.note-input:focus {
+  outline: none;
+  border-style: solid;
+  border-color: #c8a8c2;
+  background: #fff;
+}
+
+/* プレビュー */
+.preview-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.preview-head h2 {
+  font-size: 18px;
+  margin: 0;
+  color: var(--title);
+}
+.download {
+  background: var(--title);
+  color: #fff;
+  border-color: var(--title);
+  height: 42px;
+  font-weight: 700;
+  padding: 0 16px;
+}
+.download:hover {
+  background: #50685a;
+}
+.hint {
+  font-size: 12px;
+  color: var(--muted);
+  margin: 6px 0 10px;
+}
+.preview-canvas {
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+}
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 12px;
+  font-size: 13px;
+}
+.legend .leg b {
+  font-size: 16px;
+  margin-right: 2px;
+}
+.leg.mark-double b {
+  color: var(--double);
+}
+.leg.mark-circle b {
+  color: var(--circle);
+}
+.leg.mark-triangle b {
+  color: var(--triangle);
+}
+.leg.mark-cross b {
+  color: var(--cross);
+}
+
+.foot {
+  text-align: center;
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: 24px;
+}

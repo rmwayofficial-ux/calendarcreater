@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "ccagi-tools": {
+      "args": [],
+      "command": "/home/hiromi/.ccagi/bin/ccagi-tools-server",
+      "env": {
+        "HOME": "/home/hiromi"
+      }
+    },
+    "pil-mcp": {
+      "args": [],
+      "command": "/home/hiromi/.ccagi/bin/pil-mcp",
+      "env": {
+        "HOME": "/home/hiromi"
+      }
+    }
+  }
+}
