@@ -23,31 +23,32 @@ export interface Season {
 }
 
 export function seasonForMonth(month: number): Season {
+  // tint は「生成り（ほぼ白）＋季節のかすかな色」。accent は控えめなモチーフ用の色。
   switch (month) {
     case 1:
-      return { key: 'snow', label: '雪', tint: '#EDF3F9', accent: '#9CC3DE' }
+      return { key: 'snow', label: '雪', tint: '#F1F4F6', accent: '#9DB6C6' }
     case 2:
-      return { key: 'plum', label: '梅', tint: '#FBEDF1', accent: '#E29AB4' }
+      return { key: 'plum', label: '梅', tint: '#F8F1F1', accent: '#C98BA1' }
     case 3:
-      return { key: 'sakura', label: '桜', tint: '#FCEAF1', accent: '#F2A6C0' }
+      return { key: 'sakura', label: '桜', tint: '#F9F2F3', accent: '#E0A8BB' }
     case 4:
-      return { key: 'tulip', label: '春', tint: '#FBEFEA', accent: '#F0997F' }
+      return { key: 'tulip', label: '春', tint: '#F8F3ED', accent: '#D9A088' }
     case 5:
-      return { key: 'leaf', label: '新緑', tint: '#EDF6E7', accent: '#8DC375' }
+      return { key: 'leaf', label: '新緑', tint: '#F2F5ED', accent: '#9CB783' }
     case 6:
-      return { key: 'hydrangea', label: '梅雨', tint: '#EEF0FA', accent: '#97A6DD' }
+      return { key: 'hydrangea', label: '梅雨', tint: '#F1F2F7', accent: '#9AA6CC' }
     case 7:
-      return { key: 'morningGlory', label: '七夕', tint: '#EAF2FB', accent: '#7FA8E0' }
+      return { key: 'morningGlory', label: '七夕', tint: '#EFF3F8', accent: '#8FAAD0' }
     case 8:
-      return { key: 'sunflower', label: '夏', tint: '#FFF7E2', accent: '#EFB23A' }
+      return { key: 'sunflower', label: '夏', tint: '#FAF5EA', accent: '#DEB05E' }
     case 9:
-      return { key: 'moon', label: '月見', tint: '#F5F1E6', accent: '#CDB67C' }
+      return { key: 'moon', label: '月見', tint: '#F6F2E9', accent: '#C7B288' }
     case 10:
-      return { key: 'maple', label: '紅葉', tint: '#FCEFE3', accent: '#E0894D' }
+      return { key: 'maple', label: '紅葉', tint: '#F8F1E9', accent: '#CF8A5C' }
     case 11:
-      return { key: 'ginkgo', label: '銀杏', tint: '#FBF4DC', accent: '#E3BB45' }
+      return { key: 'ginkgo', label: '銀杏', tint: '#F8F3E4', accent: '#D5B85E' }
     default: // 12
-      return { key: 'holly', label: '冬', tint: '#EDF4EE', accent: '#5BA86B' }
+      return { key: 'holly', label: '冬', tint: '#EFF3EF', accent: '#6FA579' }
   }
 }
 

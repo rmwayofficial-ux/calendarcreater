@@ -3,13 +3,14 @@ import { drawSeasonMotif, seasonForMonth } from './season'
 import { themeById, type Theme } from './theme'
 import { MARK_SYMBOL, type CalendarData, type Mark } from './types'
 
-// ◎=赤 / ○=緑 / △=青 / ×=濃グレー / −=グレー（意味なので全テーマ共通）
+// ◎=赤 / ○=緑 / △=青 / ×=濃グレー / −=グレー（意味なので全テーマ共通）。
+// 彩度をやや抑え、生成りの背景になじむ落ち着いた色味に。
 const MARK_INK: Record<Mark, string> = {
-  none: '#9A9A9A',
-  double: '#E23B2E',
-  circle: '#2FA24C',
-  triangle: '#2C6FD6',
-  cross: '#555555',
+  none: '#AEA89E',
+  double: '#CF4A3C',
+  circle: '#3E9B63',
+  triangle: '#3A6FB0',
+  cross: '#5A5A5A',
 }
 const MARK_WORD: Record<Mark, string> = {
   none: '受付不可',
@@ -19,13 +20,29 @@ const MARK_WORD: Record<Mark, string> = {
   cross: '満席',
 }
 
-const SUN = '#D85151'
-const SAT = '#3F77B0'
+const SUN = '#C75D5D'
+const SAT = '#5476A6'
 
 const FONT = `'Hiragino Sans','Hiragino Kaku Gothic ProN','Noto Sans JP','Yu Gothic','Meiryo',sans-serif`
 
 // 現在のテーマ（描画中に参照。レンダリングは同期処理なのでモジュール変数で保持）
 let T: Theme = themeById('soft')
+
+// 文字間隔（対応ブラウザのみ適用。未対応でも無視されるだけで安全）
+function tracking(ctx: CanvasRenderingContext2D, px: number): void {
+  try {
+    ;(ctx as unknown as { letterSpacing: string }).letterSpacing = `${px}px`
+  } catch {
+    // 無視
+  }
+}
+
+// 文字色（淡いラベル用）。ink と背景の中間色。
+function mutedInk(): string {
+  return mixHex(T.ink, T.cardBg, 0.46)
+}
+
+const clamp = (v: number, lo: number, hi: number): number => Math.max(lo, Math.min(hi, v))
 
 function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number): void {
   const rr = Math.max(0, Math.min(r, w / 2, h / 2))
@@ -49,18 +66,18 @@ const SCALE = 2
 const OUTER_X = 64
 const OUTER_TOP = 60
 const OUTER_BOTTOM = 60
-const CARD_PAD = 26
-const TITLE_H = 96
-const GRID_TOP_GAP = 8
-const WEEKDAY_H = 52
+const CARD_PAD = 34
+const TITLE_H = 122
+const GRID_TOP_GAP = 14
+const WEEKDAY_H = 56
 const ROW_BASE_H = 156
 const ROW_NOTE_H = 32
-const LEGEND_H = 96
+const LEGEND_H = 90
 
 // カレンダー本体（白いカード）の幅は常に一定。出力サイズは周囲の余白で調整する。
 const CARD_W = W - OUTER_X * 2
 // 縦横比を固定する出力で、カードの周りに最低限とる余白
-const FIT_MARGIN = 72
+const FIT_MARGIN = 80
 
 // 出力サイズ（投稿先に合わせた縦横比）
 export interface OutputFormat {
@@ -147,7 +164,7 @@ export function drawCalendar(
   const bodyH = rowHeights.reduce((a, b) => a + b, 0)
   const gridH = WEEKDAY_H + bodyH
 
-  const cardH = CARD_PAD + TITLE_H + GRID_TOP_GAP + gridH + 22 + LEGEND_H + CARD_PAD
+  const cardH = CARD_PAD + TITLE_H + GRID_TOP_GAP + gridH + 24 + LEGEND_H + CARD_PAD
 
   // 出力サイズ（投稿先）に応じて canvas 寸法とカード位置を決める
   const { canvasW, canvasH, cardX, cardY } = computeLayout(cardW, cardH, formatById(formatId).ratio)
@@ -162,21 +179,21 @@ export function drawCalendar(
 
   const season = seasonForMonth(data.month)
 
-  // 背景
+  // 背景（生成り＋季節のかすかな色）
   ctx.fillStyle = T.seasonTint ? season.tint : T.plainBg
   ctx.fillRect(0, 0, canvasW, canvasH)
 
-  // 余白に季節モチーフ（毎月ちがう絵柄・色）。クール等 motif=false のテーマは背景の色のみ。
+  // 余白に季節モチーフ（薄く控えめに）。クール・シャープ等 motif=false は背景の色のみ。
   if (T.motif) {
     drawDecorations(ctx, season.key, season.accent, { x: cardX, y: cardY, w: cardW, h: cardH }, canvasW, canvasH)
   }
 
-  // 白いカード
+  // 白いカード（影は控えめに）
   ctx.save()
   if (T.shadowBlur > 0) {
     ctx.shadowColor = T.shadowColor
     ctx.shadowBlur = T.shadowBlur
-    ctx.shadowOffsetY = 6
+    ctx.shadowOffsetY = 8
   }
   roundRect(ctx, cardX, cardY, cardW, cardH, T.cardRadius)
   ctx.fillStyle = T.cardBg
@@ -184,32 +201,52 @@ export function drawCalendar(
   ctx.restore()
 
   // ===== カード内 =====
-  let y = cardY + CARD_PAD
+  const y0 = cardY + CARD_PAD
+  const muted = mutedInk()
 
-  // 見出し（1.5倍）
-  ctx.fillStyle = T.accent
+  // 見出しブロック：小さな年・季節ラベル → タイトル → 短いヘアライン
   ctx.textAlign = 'center'
-  ctx.font = `bold 69px ${FONT}`
-  ctx.fillText(data.title || `${data.month}月の予約状況`, cardCenterX, y + 66)
-  y += TITLE_H + GRID_TOP_GAP
+  // 年（季節テーマなら季節名も）
+  ctx.font = `600 20px ${FONT}`
+  ctx.fillStyle = muted
+  tracking(ctx, 6)
+  const kicker = T.seasonTint ? `${data.year}　${season.label}` : `${data.year}`
+  ctx.fillText(kicker, cardCenterX, y0 + 24)
+  tracking(ctx, 0)
+  // タイトル
+  ctx.font = `600 56px ${FONT}`
+  ctx.fillStyle = T.ink
+  tracking(ctx, 1.5)
+  ctx.fillText(data.title || `${data.month}月の予約状況`, cardCenterX, y0 + 84)
+  tracking(ctx, 0)
+  // 短い区切り線
+  ctx.strokeStyle = T.accent
+  ctx.globalAlpha = 0.5
+  ctx.lineWidth = 2
+  ctx.lineCap = 'round'
+  ctx.beginPath()
+  ctx.moveTo(cardCenterX - 44, y0 + 106)
+  ctx.lineTo(cardCenterX + 44, y0 + 106)
+  ctx.stroke()
+  ctx.globalAlpha = 1
+  ctx.lineCap = 'butt'
+
+  let y = y0 + TITLE_H + GRID_TOP_GAP
 
   // カレンダー表
   const gX = gridX
   const gY = y
   const bodyTop = gY + WEEKDAY_H
 
-  ctx.save()
-  roundRect(ctx, gX, gY, gridW, gridH, T.gridRadius)
-  ctx.clip()
-  ctx.fillStyle = T.accent
-  ctx.fillRect(gX, gY, gridW, WEEKDAY_H)
-  ctx.font = `bold 24px ${FONT}`
-  ctx.fillStyle = '#FFFFFF'
+  // 曜日（ベタ塗りせず、文字＋細い罫線で上品に）
   ctx.textAlign = 'center'
+  ctx.font = `600 23px ${FONT}`
+  tracking(ctx, 2)
   for (let i = 0; i < 7; i++) {
-    ctx.fillText(WEEKDAY_LABELS[i], gX + colW * i + colW / 2, gY + 33)
+    ctx.fillStyle = i === 0 ? SUN : i === 6 ? SAT : muted
+    ctx.fillText(WEEKDAY_LABELS[i], gX + colW * i + colW / 2, gY + 37)
   }
-  ctx.restore()
+  tracking(ctx, 0)
 
   // セル内容（罫線より先）
   let cy = bodyTop
@@ -221,7 +258,7 @@ export function drawCalendar(
     cy += rowH
   })
 
-  // 罫線＋外枠（内容の上に描いて枠を必ず残す）
+  // 罫線（細いヘアライン）。曜日の下だけアクセント寄りの線で軽く区切る。
   ctx.save()
   roundRect(ctx, gX, gY, gridW, gridH, T.gridRadius)
   ctx.clip()
@@ -242,13 +279,22 @@ export function drawCalendar(
     ctx.lineTo(gX + gridW, hy)
     ctx.stroke()
   }
+  // 曜日帯の下のライン（少しだけ強調）
+  ctx.strokeStyle = mixHex(T.accent, T.cardBg, 0.5)
+  ctx.lineWidth = 1.4
+  ctx.beginPath()
+  ctx.moveTo(gX, bodyTop)
+  ctx.lineTo(gX + gridW, bodyTop)
+  ctx.stroke()
   ctx.restore()
+
+  // 外枠（ヘアライン）
   roundRect(ctx, gX, gY, gridW, gridH, T.gridRadius)
   ctx.strokeStyle = T.frame
   ctx.lineWidth = T.frameWidth
   ctx.stroke()
 
-  y = gY + gridH + 22
+  y = gY + gridH + 24
 
   drawLegend(ctx, gridX, gridW, y)
 
@@ -269,14 +315,14 @@ function drawCell(
   const dateColor = cell.holidayName || cell.isSunday ? SUN : cell.isSaturday ? SAT : T.ink
   ctx.fillStyle = dateColor
   ctx.textAlign = 'left'
-  ctx.font = `bold 30px ${FONT}`
-  ctx.fillText(String(cell.day), x + 12, y + 33)
+  ctx.font = `600 26px ${FONT}`
+  ctx.fillText(String(cell.day), x + 14, y + 34)
 
   if (cell.holidayName) {
     ctx.fillStyle = SUN
     ctx.textAlign = 'right'
     ctx.font = `12px ${FONT}`
-    ctx.fillText(cell.holidayName, x + w - 9, y + 21)
+    ctx.fillText(cell.holidayName, x + w - 10, y + 22)
   }
 
   const ds = data.marks[cell.day] ?? { am: 'none' as Mark, pm: 'none' as Mark, note: '' }
@@ -288,14 +334,14 @@ function drawCell(
     return
   }
 
-  drawSlot(ctx, 'AM', ds.am, x, y + 70, w)
+  drawSlot(ctx, 'AM', ds.am, x, y + 72, w)
   ctx.strokeStyle = T.divider
-  ctx.lineWidth = 1.5
+  ctx.lineWidth = 1
   ctx.beginPath()
-  ctx.moveTo(x + w * 0.3, y + 98)
-  ctx.lineTo(x + w * 0.7, y + 98)
+  ctx.moveTo(x + w * 0.32, y + 100)
+  ctx.lineTo(x + w * 0.68, y + 100)
   ctx.stroke()
-  drawSlot(ctx, 'PM', ds.pm, x, y + 126, w)
+  drawSlot(ctx, 'PM', ds.pm, x, y + 128, w)
 
   if (note) drawNoteBand(ctx, note, x, y + h - 26, w)
 }
@@ -303,49 +349,53 @@ function drawCell(
 function drawSlot(ctx: CanvasRenderingContext2D, label: string, mark: Mark, x: number, centerY: number, w: number): void {
   ctx.textBaseline = 'middle'
 
-  ctx.fillStyle = T.ink
+  // AM / PM（小さく・淡く・トラッキング）
+  ctx.fillStyle = mutedInk()
   ctx.textAlign = 'left'
-  ctx.font = `bold 22px ${FONT}`
-  ctx.fillText(label, x + 12, centerY)
+  ctx.font = `600 15px ${FONT}`
+  tracking(ctx, 1)
+  ctx.fillText(label, x + 14, centerY)
+  tracking(ctx, 0)
 
   ctx.textAlign = 'center'
   if (mark === 'none') {
     // 何も入っていない日は横棒「−」（予約を受け付けない＝受付不可）
-    drawBoldSymbol(ctx, '−', x + w * 0.64, centerY, 40, MARK_INK.none)
+    drawSymbol(ctx, '−', x + w * 0.63, centerY, 38, MARK_INK.none)
   } else {
-    drawBoldSymbol(ctx, MARK_SYMBOL[mark], x + w * 0.64, centerY, 42, MARK_INK[mark])
+    drawSymbol(ctx, MARK_SYMBOL[mark], x + w * 0.63, centerY, 40, MARK_INK[mark])
   }
 
   ctx.textBaseline = 'alphabetic'
 }
 
-function drawBoldSymbol(ctx: CanvasRenderingContext2D, sym: string, x: number, y: number, size: number, color: string): void {
-  ctx.font = `bold ${size}px ${FONT}`
+// マーク記号（塗り＋ごく細い縁取りで、にじまずクリアに）
+function drawSymbol(ctx: CanvasRenderingContext2D, sym: string, x: number, y: number, size: number, color: string): void {
+  ctx.font = `600 ${size}px ${FONT}`
   ctx.fillStyle = color
-  ctx.strokeStyle = color
-  ctx.lineWidth = size * 0.05
-  ctx.lineJoin = 'round'
   ctx.fillText(sym, x, y)
+  ctx.strokeStyle = color
+  ctx.lineWidth = size * 0.02
+  ctx.lineJoin = 'round'
   ctx.strokeText(sym, x, y)
 }
 
 function drawNoteBig(ctx: CanvasRenderingContext2D, text: string, x: number, top: number, w: number, areaH: number): void {
   const maxW = w - 26
-  ctx.font = `bold 14px ${FONT}`
+  ctx.font = `600 14px ${FONT}`
   let chosen = 14
   let lines = layoutNoteLines(ctx, text, maxW)
   for (let s = 30; s >= 14; s--) {
-    ctx.font = `bold ${s}px ${FONT}`
+    ctx.font = `600 ${s}px ${FONT}`
     const ls = layoutNoteLines(ctx, text, maxW)
-    const lineH = s * 1.22
+    const lineH = s * 1.24
     if (ls.length * lineH <= areaH) {
       chosen = s
       lines = ls
       break
     }
   }
-  ctx.font = `bold ${chosen}px ${FONT}`
-  const lineH = chosen * 1.22
+  ctx.font = `600 ${chosen}px ${FONT}`
+  const lineH = chosen * 1.24
   const blockH = lines.length * lineH
   const startY = top + (areaH - blockH) / 2 + chosen * 0.86
   ctx.fillStyle = T.accent
@@ -367,7 +417,7 @@ function layoutNoteLines(ctx: CanvasRenderingContext2D, text: string, maxW: numb
 
 function drawNoteBand(ctx: CanvasRenderingContext2D, text: string, x: number, top: number, w: number): void {
   const maxW = w - 18
-  ctx.font = `bold 15px ${FONT}`
+  ctx.font = `600 15px ${FONT}`
   ctx.fillStyle = T.accent
   ctx.textAlign = 'center'
   const oneLine = text.replace(/\s*\n\s*/g, ' ')
@@ -400,23 +450,24 @@ function wrapText(ctx: CanvasRenderingContext2D, text: string, maxW: number, max
 
 function drawLegend(ctx: CanvasRenderingContext2D, gridX: number, gridW: number, top: number): void {
   const items: Mark[] = ['double', 'circle', 'triangle', 'cross', 'none']
-  const symW = 50
-  const gap = 34
-  ctx.font = `bold 28px ${FONT}`
+  const symW = 44
+  const gap = 30
+  ctx.font = `600 24px ${FONT}`
   const itemWs = items.map((m) => symW + ctx.measureText(MARK_WORD[m]).width)
   const totalW = itemWs.reduce((a, b) => a + b, 0) + gap * (items.length - 1)
   let x = gridX + (gridW - totalW) / 2
-  const baseY = top + 50
+  const baseY = top + 46
   items.forEach((m, i) => {
     ctx.textAlign = 'left'
-    drawBoldSymbol(ctx, m === 'none' ? '−' : MARK_SYMBOL[m], x + 4, baseY, 42, MARK_INK[m])
+    drawSymbol(ctx, m === 'none' ? '−' : MARK_SYMBOL[m], x + 2, baseY, 36, MARK_INK[m])
     ctx.fillStyle = T.ink
-    ctx.font = `bold 28px ${FONT}`
-    ctx.fillText(MARK_WORD[m], x + symW, baseY - 4)
+    ctx.font = `600 24px ${FONT}`
+    ctx.fillText(MARK_WORD[m], x + symW, baseY - 3)
     x += itemWs[i] + gap
   })
 }
 
+// 余白に季節モチーフを「薄く・控えめに」配置。カードの陰からのぞくように2点だけ。
 function drawDecorations(
   ctx: CanvasRenderingContext2D,
   key: ReturnType<typeof seasonForMonth>['key'],
@@ -425,36 +476,28 @@ function drawDecorations(
   w: number,
   h: number,
 ): void {
-  const cardBottom = card.y + card.h
-  const topMid = card.y / 2
-  const botMid = (cardBottom + h) / 2
-  const leftMid = card.x / 2
-  const rightMid = (card.x + card.w + w) / 2
-
-  const spots: [number, number, number, number][] = [
-    [leftMid + 6, topMid, 26, 0.85],
-    [w * 0.3, topMid - 6, 16, 0.5],
-    [w * 0.7, topMid + 4, 17, 0.5],
-    [rightMid - 6, topMid, 26, 0.85],
-    [leftMid + 6, botMid, 26, 0.85],
-    [w * 0.34, botMid + 4, 16, 0.5],
-    [w * 0.66, botMid - 4, 18, 0.5],
-    [rightMid - 6, botMid, 26, 0.85],
-    [leftMid, h * 0.4, 20, 0.6],
-    [rightMid, h * 0.46, 20, 0.6],
-    [leftMid, h * 0.62, 16, 0.45],
-    [rightMid, h * 0.66, 16, 0.45],
-  ]
-
-  // テーマに合わせて季節イラストの色・濃さ・大きさを変える
   const motifColor = mixHex(accent, T.decoBlend, T.decoBlendAmt)
+  const cardR = card.x + card.w
+  const cardB = card.y + card.h
+  const rightM = w - cardR
+  const bottomM = h - cardB
+  const leftM = card.x
+  const topM = card.y
 
-  spots.forEach(([cx, cy, r, a]) => {
+  const spot = (cx: number, cy: number, r: number, a: number): void => {
     ctx.save()
     ctx.globalAlpha = a * T.decoAlpha
     drawSeasonMotif(ctx, key, cx, cy, r * T.decoScale, motifColor)
     ctx.restore()
-  })
+  }
+
+  // 主モチーフ：右下のコーナー（大きめ・うっすら）
+  const r1 = clamp(Math.min(rightM, bottomM) * 1.15, 46, 116)
+  spot(cardR + rightM * 0.35, cardB + bottomM * 0.35, r1, 0.13)
+
+  // 補助モチーフ：左上のコーナー（小さめ・さらにうっすら）
+  const r2 = clamp(Math.min(leftM, topM) * 1.0, 36, 84)
+  spot(leftM * 0.5, topM * 0.55, r2, 0.1)
 }
 
 // 2色を amount(0..1) で混ぜる
