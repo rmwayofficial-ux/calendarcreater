@@ -170,20 +170,31 @@ export default function App() {
     <div className="app">
       <header className="topbar">
         <span className="brand-logo" aria-hidden>
-          <svg width="40" height="40" viewBox="0 0 40 40">
-            <rect x="2" y="2" width="36" height="36" rx="11" fill="#4ab4aa" />
-            <g stroke="#ffffff" strokeWidth="2.4" fill="none" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="9" y="12" width="22" height="18" rx="3.5" />
-              <line x1="9" y1="18" x2="31" y2="18" />
-              <line x1="15" y1="8" x2="15" y2="13" />
-              <line x1="25" y1="8" x2="25" y2="13" />
-            </g>
-            <circle cx="20" cy="24.5" r="2.6" fill="#ffffff" />
+          <svg width="44" height="44" viewBox="0 0 64 64">
+            <defs>
+              <linearGradient id="cc-logo" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stopColor="#5ec8bd" />
+                <stop offset="1" stopColor="#3f9f96" />
+              </linearGradient>
+            </defs>
+            <rect x="4" y="4" width="56" height="56" rx="16" fill="url(#cc-logo)" />
+            <rect x="22.5" y="11" width="4.5" height="11" rx="2.25" fill="#ffffff" />
+            <rect x="37" y="11" width="4.5" height="11" rx="2.25" fill="#ffffff" />
+            <rect x="15" y="18" width="34" height="31" rx="6" fill="#ffffff" />
+            <rect x="15" y="27" width="34" height="2" fill="#d7efeb" />
+            <path
+              d="M23 37 l6 6 l12 -13"
+              fill="none"
+              stroke="#ff7a59"
+              strokeWidth="4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
           </svg>
         </span>
         <div className="brand-text">
-          <h1>予約状況カレンダー作成</h1>
-          <p className="sub">AM・PM のマスをタップして ◎○△× を切り替え → JPEGでダウンロード</p>
+          <h1>カレンダークリエイター</h1>
+          <p className="sub">午前・午後のマスをタップして ◎○△× を切り替え → JPEGでダウンロード</p>
         </div>
       </header>
 
