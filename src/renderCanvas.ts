@@ -204,14 +204,13 @@ export function drawCalendar(
   const y0 = cardY + CARD_PAD
   const muted = mutedInk()
 
-  // 見出しブロック：小さな年・季節ラベル → タイトル → 短いヘアライン
+  // 見出しブロック：小さな年 → タイトル → 短いヘアライン
   ctx.textAlign = 'center'
-  // 年（季節テーマなら季節名も）
+  // 年（季節名は入れない）
   ctx.font = `600 20px ${FONT}`
   ctx.fillStyle = muted
   tracking(ctx, 6)
-  const kicker = T.seasonTint ? `${data.year}　${season.label}` : `${data.year}`
-  ctx.fillText(kicker, cardCenterX, y0 + 24)
+  ctx.fillText(`${data.year}`, cardCenterX, y0 + 24)
   tracking(ctx, 0)
   // タイトル
   ctx.font = `600 56px ${FONT}`
