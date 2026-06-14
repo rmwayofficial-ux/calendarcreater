@@ -114,12 +114,12 @@ export default function App() {
 
   const weeks = useMemo(() => buildWeeks(year, month), [year, month])
 
-  // 年の選択肢。端末の「今年」を基準に毎年自動で前へ進む（去年〜10年先）。
+  // 年の選択肢。端末の「今年」を基準に毎年自動で前へ進む（去年〜5年先）。
   // ◀▶ でそれ以上先へ進んだ場合も、その年を必ず含めて未来永劫使えるようにする。
   const yearOptions = useMemo(() => {
     const cy = now.getFullYear()
     const start = Math.min(cy - 1, year)
-    const end = Math.max(cy + 10, year)
+    const end = Math.max(cy + 5, year)
     const arr: number[] = []
     for (let y = start; y <= end; y++) arr.push(y)
     return arr
