@@ -61,6 +61,17 @@ export default function Guide({ onBack }: { onBack: () => void }) {
       </section>
 
       <section className="page-sec">
+        <h2>画像のサイズを選ぶ（投稿先に合わせる）</h2>
+        <p>プレビューのすぐ上にある「サイズ」ボタンで、貼り付け先に合った画像サイズを選べます。選んだサイズはそのまま保存され、次回も同じサイズで作れます。</p>
+        <ul className="page-list">
+          <li><b>ブログ用</b>：内容に合わせた標準サイズ。記事に貼りやすい形です。</li>
+          <li><b>Facebook用</b>：正方形（1:1）。フィードで全体がきれいに表示されます。</li>
+          <li><b>Instagram用</b>：縦長（4:5）。フィードで大きく表示されます。</li>
+        </ul>
+        <p>サイズを切り替えるとプレビューも変わるので、確認してから「📥 JPEGをダウンロード」を押してください。投稿先ごとに切り替えて、それぞれの画像を作れます。</p>
+      </section>
+
+      <section className="page-sec">
         <h2>デザインを選ぶ</h2>
         <p>プレビューのすぐ上にある小さな「デザイン」ボタンで、見た目を選べます（記号の色は共通です）。</p>
         <ul className="page-list">

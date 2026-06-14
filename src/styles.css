@@ -701,8 +701,12 @@ textarea:focus {
   margin: 6px 0 12px;
 }
 .preview-canvas {
+  display: block;
   width: 100%;
   height: auto;
+  max-height: 74vh;
+  object-fit: contain;
+  margin: 0 auto;
   border: 1px solid var(--line);
   border-radius: 12px;
   background: #fff;

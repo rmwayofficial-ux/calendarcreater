@@ -50,6 +50,25 @@ export function saveThemeId(id: string): void {
   }
 }
 
+// ===== 出力サイズ（投稿先フォーマット）の保存 =====
+const FORMAT_KEY = 'calcreate:format'
+
+export function loadFormatId(): string | null {
+  try {
+    return localStorage.getItem(FORMAT_KEY)
+  } catch {
+    return null
+  }
+}
+
+export function saveFormatId(id: string): void {
+  try {
+    localStorage.setItem(FORMAT_KEY, id)
+  } catch {
+    // 無視
+  }
+}
+
 // ===== 初回ガイドの表示状態 =====
 const INTRO_KEY = 'calcreate:introSeen'
 

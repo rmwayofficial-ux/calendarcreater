@@ -2,14 +2,16 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { buildWeeks, daysOfWeekday, WEEKDAY_LABELS } from './calendar'
 import Guide from './Guide'
 import Help from './Help'
-import { drawCalendar, toJpegDataUrl } from './renderCanvas'
+import { drawCalendar, FORMATS, formatById, toJpegDataUrl } from './renderCanvas'
 import {
   exportAll,
   importAll,
+  loadFormatId,
   loadIntroSeen,
   loadMonth,
   loadPreviousMonth,
   loadThemeId,
+  saveFormatId,
   saveIntroSeen,
   saveMonth,
   saveThemeId,
@@ -48,6 +50,9 @@ export default function App() {
   const [themeId, setThemeId] = useState<string>(() => loadThemeId() ?? 'soft')
   const theme = useMemo(() => themeById(themeId), [themeId])
 
+  // 出力サイズ（投稿先：ブログ／Facebook／Instagram）
+  const [formatId, setFormatId] = useState<string>(() => loadFormatId() ?? 'blog')
+
   // 初回ガイド（はじめて使う人向けの説明。閉じると次回から出ない）
   const [showIntro, setShowIntro] = useState(() => !loadIntroSeen())
   const dismissIntro = () => {
@@ -83,10 +88,15 @@ export default function App() {
     saveThemeId(themeId)
   }, [themeId])
 
+  // 出力サイズの保存
+  useEffect(() => {
+    saveFormatId(formatId)
+  }, [formatId])
+
   // プレビュー（=ダウンロード画像）を再描画
   useEffect(() => {
-    if (canvasRef.current) drawCalendar(canvasRef.current, data, theme)
-  }, [data, theme])
+    if (canvasRef.current) drawCalendar(canvasRef.current, data, theme, formatId)
+  }, [data, theme, formatId])
 
   const weeks = useMemo(() => buildWeeks(year, month), [year, month])
 
@@ -159,7 +169,7 @@ export default function App() {
     const url = toJpegDataUrl(canvas, 0.92)
     const a = document.createElement('a')
     a.href = url
-    a.download = `予約状況_${year}-${String(month).padStart(2, '0')}.jpg`
+    a.download = `予約状況_${year}-${String(month).padStart(2, '0')}_${formatById(formatId).fileTag}.jpg`
     a.click()
   }
 
@@ -385,6 +395,20 @@ export default function App() {
             <button className="download" onClick={download}>📥 JPEGをダウンロード</button>
           </div>
           <p className="hint">この画像がそのまま保存されます（ブログにアップしてください）。</p>
+
+          <div className="design-row">
+            <span className="design-label">サイズ</span>
+            {FORMATS.map((f) => (
+              <button
+                key={f.id}
+                className={`design-btn ${formatId === f.id ? 'active' : ''}`}
+                onClick={() => setFormatId(f.id)}
+                title={f.hint}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
 
           <div className="design-row">
             <span className="design-label">デザイン</span>

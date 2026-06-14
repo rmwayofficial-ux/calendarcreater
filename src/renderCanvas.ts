@@ -57,13 +57,71 @@ const ROW_BASE_H = 156
 const ROW_NOTE_H = 32
 const LEGEND_H = 96
 
-export function drawCalendar(canvas: HTMLCanvasElement, data: CalendarData, theme?: Theme): RenderResult {
+// カレンダー本体（白いカード）の幅は常に一定。出力サイズは周囲の余白で調整する。
+const CARD_W = W - OUTER_X * 2
+// 縦横比を固定する出力で、カードの周りに最低限とる余白
+const FIT_MARGIN = 72
+
+// 出力サイズ（投稿先に合わせた縦横比）
+export interface OutputFormat {
+  id: string
+  label: string
+  hint: string
+  fileTag: string // ダウンロードファイル名に付ける語
+  ratio: number | null // 幅 / 高さ。null は内容に合わせた自然なサイズ
+}
+
+export const FORMATS: OutputFormat[] = [
+  { id: 'blog', label: 'ブログ用', hint: '内容に合わせた標準サイズ（記事に貼りやすい）', fileTag: 'ブログ', ratio: null },
+  { id: 'facebook', label: 'Facebook用', hint: '正方形 1:1（フィードで全体が表示されます）', fileTag: 'Facebook', ratio: 1 },
+  { id: 'instagram', label: 'Instagram用', hint: '縦長 4:5（フィードで大きく表示されます）', fileTag: 'Instagram', ratio: 4 / 5 },
+]
+
+export function formatById(id: string | null | undefined): OutputFormat {
+  return FORMATS.find((f) => f.id === id) ?? FORMATS[0]
+}
+
+interface Layout {
+  canvasW: number
+  canvasH: number
+  cardX: number
+  cardY: number
+}
+
+// カード（cardW×cardH）を、指定の縦横比に収まる canvas の中央へ配置する
+function computeLayout(cardW: number, cardH: number, ratio: number | null): Layout {
+  if (ratio == null) {
+    return {
+      canvasW: cardW + OUTER_X * 2,
+      canvasH: OUTER_TOP + cardH + OUTER_BOTTOM,
+      cardX: OUTER_X,
+      cardY: OUTER_TOP,
+    }
+  }
+  const needW = cardW + FIT_MARGIN * 2
+  const needH = cardH + FIT_MARGIN * 2
+  let canvasW: number
+  let canvasH: number
+  if (needW / needH >= ratio) {
+    canvasW = needW
+    canvasH = needW / ratio
+  } else {
+    canvasH = needH
+    canvasW = needH * ratio
+  }
+  return { canvasW, canvasH, cardX: (canvasW - cardW) / 2, cardY: (canvasH - cardH) / 2 }
+}
+
+export function drawCalendar(
+  canvas: HTMLCanvasElement,
+  data: CalendarData,
+  theme?: Theme,
+  formatId?: string,
+): RenderResult {
   T = theme ?? T
   const weeks = buildWeeks(data.year, data.month)
 
-  const cardX = OUTER_X
-  const cardW = W - OUTER_X * 2
-  const gridX = cardX + CARD_PAD
+  const cardW = CARD_W
   const gridW = cardW - CARD_PAD * 2
   const colW = gridW / 7
 
@@ -90,11 +148,14 @@ export function drawCalendar(canvas: HTMLCanvasElement, data: CalendarData, them
   const gridH = WEEKDAY_H + bodyH
 
   const cardH = CARD_PAD + TITLE_H + GRID_TOP_GAP + gridH + 22 + LEGEND_H + CARD_PAD
-  const cardY = OUTER_TOP
-  const H = OUTER_TOP + cardH + OUTER_BOTTOM
 
-  canvas.width = W * SCALE
-  canvas.height = H * SCALE
+  // 出力サイズ（投稿先）に応じて canvas 寸法とカード位置を決める
+  const { canvasW, canvasH, cardX, cardY } = computeLayout(cardW, cardH, formatById(formatId).ratio)
+  const gridX = cardX + CARD_PAD
+  const cardCenterX = cardX + cardW / 2
+
+  canvas.width = canvasW * SCALE
+  canvas.height = canvasH * SCALE
   const ctx = canvas.getContext('2d')!
   ctx.setTransform(SCALE, 0, 0, SCALE, 0, 0)
   ctx.textBaseline = 'alphabetic'
@@ -103,11 +164,11 @@ export function drawCalendar(canvas: HTMLCanvasElement, data: CalendarData, them
 
   // 背景
   ctx.fillStyle = T.seasonTint ? season.tint : T.plainBg
-  ctx.fillRect(0, 0, W, H)
+  ctx.fillRect(0, 0, canvasW, canvasH)
 
   // 余白に季節モチーフ（毎月ちがう絵柄・色）。クール等 motif=false のテーマは背景の色のみ。
   if (T.motif) {
-    drawDecorations(ctx, season.key, season.accent, { x: cardX, y: cardY, w: cardW, h: cardH }, W, H)
+    drawDecorations(ctx, season.key, season.accent, { x: cardX, y: cardY, w: cardW, h: cardH }, canvasW, canvasH)
   }
 
   // 白いカード
@@ -129,7 +190,7 @@ export function drawCalendar(canvas: HTMLCanvasElement, data: CalendarData, them
   ctx.fillStyle = T.accent
   ctx.textAlign = 'center'
   ctx.font = `bold 69px ${FONT}`
-  ctx.fillText(data.title || `${data.month}月の予約状況`, W / 2, y + 66)
+  ctx.fillText(data.title || `${data.month}月の予約状況`, cardCenterX, y + 66)
   y += TITLE_H + GRID_TOP_GAP
 
   // カレンダー表
