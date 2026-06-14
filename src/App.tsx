@@ -324,7 +324,7 @@ export default function App() {
               </select>
               <select value={bulkMark} onChange={(e) => setBulkMark(e.target.value as Mark)}>
                 {MARK_CYCLE.map((m) => (
-                  <option key={m} value={m}>{m === 'none' ? '空白（定休）' : `${MARK_SYMBOL[m]} ${MARK_LABEL[m]}`}</option>
+                  <option key={m} value={m}>{m === 'none' ? '− 受付不可（空白）' : `${MARK_SYMBOL[m]} ${MARK_LABEL[m]}`}</option>
                 ))}
               </select>
               <button onClick={applyBulk}>まとめて設定</button>
@@ -402,9 +402,9 @@ export default function App() {
 
           <canvas ref={canvasRef} className="preview-canvas" />
           <div className="legend">
-            {MARK_CYCLE.filter((m) => m !== 'none').map((m) => (
+            {(['double', 'circle', 'triangle', 'cross', 'none'] as Mark[]).map((m) => (
               <span key={m} className={`leg mark-${m}`}>
-                <b>{MARK_SYMBOL[m]}</b> {MARK_LABEL[m]}
+                <b>{MARK_SYMBOL[m] || '−'}</b> {MARK_LABEL[m]}
               </span>
             ))}
           </div>

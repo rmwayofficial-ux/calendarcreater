@@ -35,7 +35,7 @@ export default function Guide({ onBack }: { onBack: () => void }) {
             <tr><td className="m-circle">○</td><td>空きあり</td></tr>
             <tr><td className="m-triangle">△</td><td>残りわずか</td></tr>
             <tr><td className="m-cross">×</td><td>満席</td></tr>
-            <tr><td className="m-none">休</td><td>休み・定休（マークを空白にすると「休」と表示されます）</td></tr>
+            <tr><td className="m-none">−</td><td>受付不可（予約を入れられない日）。マークを空白にすると横棒「−」が表示されます</td></tr>
           </tbody>
         </table>
       </section>

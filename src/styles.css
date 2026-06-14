@@ -731,6 +731,9 @@ textarea:focus {
 .leg.mark-cross b {
   color: var(--cross);
 }
+.leg.mark-none b {
+  color: #9aa3ad;
+}
 
 .foot {
   text-align: center;

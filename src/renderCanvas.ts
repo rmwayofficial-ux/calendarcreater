@@ -3,7 +3,7 @@ import { drawSeasonMotif, seasonForMonth } from './season'
 import { themeById, type Theme } from './theme'
 import { MARK_SYMBOL, type CalendarData, type Mark } from './types'
 
-// ◎=赤 / ○=緑 / △=青 / ×=濃グレー / 休=グレー（意味なので全テーマ共通）
+// ◎=赤 / ○=緑 / △=青 / ×=濃グレー / −=グレー（意味なので全テーマ共通）
 const MARK_INK: Record<Mark, string> = {
   none: '#9A9A9A',
   double: '#E23B2E',
@@ -12,7 +12,7 @@ const MARK_INK: Record<Mark, string> = {
   cross: '#555555',
 }
 const MARK_WORD: Record<Mark, string> = {
-  none: '休み',
+  none: '受付不可',
   double: '空き十分',
   circle: '空きあり',
   triangle: '残りわずか',
@@ -249,9 +249,8 @@ function drawSlot(ctx: CanvasRenderingContext2D, label: string, mark: Mark, x: n
 
   ctx.textAlign = 'center'
   if (mark === 'none') {
-    ctx.fillStyle = MARK_INK.none
-    ctx.font = `28px ${FONT}`
-    ctx.fillText('休', x + w * 0.64, centerY)
+    // 何も入っていない日は横棒「−」（予約を受け付けない＝受付不可）
+    drawBoldSymbol(ctx, '−', x + w * 0.64, centerY, 40, MARK_INK.none)
   } else {
     drawBoldSymbol(ctx, MARK_SYMBOL[mark], x + w * 0.64, centerY, 42, MARK_INK[mark])
   }
@@ -339,7 +338,7 @@ function wrapText(ctx: CanvasRenderingContext2D, text: string, maxW: number, max
 }
 
 function drawLegend(ctx: CanvasRenderingContext2D, gridX: number, gridW: number, top: number): void {
-  const items: Mark[] = ['double', 'circle', 'triangle', 'cross']
+  const items: Mark[] = ['double', 'circle', 'triangle', 'cross', 'none']
   const symW = 50
   const gap = 34
   ctx.font = `bold 28px ${FONT}`
@@ -349,7 +348,7 @@ function drawLegend(ctx: CanvasRenderingContext2D, gridX: number, gridW: number,
   const baseY = top + 50
   items.forEach((m, i) => {
     ctx.textAlign = 'left'
-    drawBoldSymbol(ctx, MARK_SYMBOL[m], x + 4, baseY, 42, MARK_INK[m])
+    drawBoldSymbol(ctx, m === 'none' ? '−' : MARK_SYMBOL[m], x + 4, baseY, 42, MARK_INK[m])
     ctx.fillStyle = T.ink
     ctx.font = `bold 28px ${FONT}`
     ctx.fillText(MARK_WORD[m], x + symW, baseY - 4)

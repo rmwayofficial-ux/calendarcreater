@@ -1,5 +1,5 @@
 // 予約状況マーク。空き量を4段階で表す。
-//  none     : 未設定（定休日・営業時間外として扱う）
+//  none     : 未設定（横棒「−」で表示。予約を受け付けない＝受付不可の日として扱う）
 //  double   : ◎ 空き十分・ご予約可
 //  circle   : ○ 空きあり
 //  triangle : △ 残りわずか
@@ -18,7 +18,7 @@ export const MARK_SYMBOL: Record<Mark, string> = {
 }
 
 export const MARK_LABEL: Record<Mark, string> = {
-  none: '定休・時間外',
+  none: '受付不可',
   double: '空き十分',
   circle: '空きあり',
   triangle: '残りわずか',
