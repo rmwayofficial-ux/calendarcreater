@@ -19,6 +19,11 @@ export interface Theme {
   shadowColor: string
   seasonTint: boolean // 背景に季節の淡い色を使うか
   plainBg: string // seasonTint=false のときの背景色
+  // 季節イラスト（背景モチーフ）をテーマごとに変える設定
+  decoBlend: string // 季節色をこの色へ寄せる
+  decoBlendAmt: number // 0..1（寄せる割合）
+  decoAlpha: number // 透明度の倍率
+  decoScale: number // 大きさの倍率
 }
 
 export const THEMES: Theme[] = [
@@ -28,10 +33,10 @@ export const THEMES: Theme[] = [
     hint: '丸み・淡い色・やさしい雰囲気',
     accent: '#4AB4AA',
     ink: '#4A4A4A',
-    frame: '#B9B9B9',
-    frameWidth: 1.6,
-    gridLine: '#D9D9D9',
-    gridWidth: 1.2,
+    frame: '#6E6E6E',
+    frameWidth: 2.2,
+    gridLine: '#9A9A9A',
+    gridWidth: 1.7,
     divider: '#DCDCDC',
     cardBg: '#FFFFFF',
     cardRadius: 24,
@@ -40,6 +45,10 @@ export const THEMES: Theme[] = [
     shadowColor: 'rgba(60,60,60,0.14)',
     seasonTint: true,
     plainBg: '#FFFFFF',
+    decoBlend: '#4AB4AA',
+    decoBlendAmt: 0.18,
+    decoAlpha: 0.95,
+    decoScale: 1.0,
   },
   {
     id: 'sharp',
@@ -49,8 +58,8 @@ export const THEMES: Theme[] = [
     ink: '#23303A',
     frame: '#3F3F3F',
     frameWidth: 2.6,
-    gridLine: '#8C8C8C',
-    gridWidth: 1.6,
+    gridLine: '#7E7E7E',
+    gridWidth: 1.7,
     divider: '#C6C6C6',
     cardBg: '#FFFFFF',
     cardRadius: 0,
@@ -59,6 +68,10 @@ export const THEMES: Theme[] = [
     shadowColor: 'rgba(0,0,0,0)',
     seasonTint: false,
     plainBg: '#EEF1F4',
+    decoBlend: '#1F6F7A',
+    decoBlendAmt: 0.42,
+    decoAlpha: 0.9,
+    decoScale: 0.85,
   },
   {
     id: 'warm',
@@ -66,10 +79,10 @@ export const THEMES: Theme[] = [
     hint: '温かみ・ナチュラル・落ち着き',
     accent: '#7D9A5C',
     ink: '#574C3E',
-    frame: '#CBBA9F',
-    frameWidth: 1.8,
-    gridLine: '#E4D9C5',
-    gridWidth: 1.2,
+    frame: '#8A6E45',
+    frameWidth: 2.2,
+    gridLine: '#B39A72',
+    gridWidth: 1.7,
     divider: '#E3D9C8',
     cardBg: '#FFFDF7',
     cardRadius: 20,
@@ -78,6 +91,10 @@ export const THEMES: Theme[] = [
     shadowColor: 'rgba(150,120,80,0.16)',
     seasonTint: true,
     plainBg: '#FBF6EC',
+    decoBlend: '#9C7A4E',
+    decoBlendAmt: 0.3,
+    decoAlpha: 1.0,
+    decoScale: 1.08,
   },
 ]
 

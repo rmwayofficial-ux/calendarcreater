@@ -384,12 +384,31 @@ function drawDecorations(
     [rightMid, h * 0.66, 16, 0.45],
   ]
 
+  // テーマに合わせて季節イラストの色・濃さ・大きさを変える
+  const motifColor = mixHex(accent, T.decoBlend, T.decoBlendAmt)
+
   spots.forEach(([cx, cy, r, a]) => {
     ctx.save()
-    ctx.globalAlpha = a
-    drawSeasonMotif(ctx, key, cx, cy, r, accent)
+    ctx.globalAlpha = a * T.decoAlpha
+    drawSeasonMotif(ctx, key, cx, cy, r * T.decoScale, motifColor)
     ctx.restore()
   })
+}
+
+// 2色を amount(0..1) で混ぜる
+function mixHex(a: string, b: string, amount: number): string {
+  const pa = parseHex(a)
+  const pb = parseHex(b)
+  if (!pa || !pb) return a
+  const m = (x: number, y: number) => Math.round(x + (y - x) * amount)
+  return `rgb(${m(pa[0], pb[0])},${m(pa[1], pb[1])},${m(pa[2], pb[2])})`
+}
+
+function parseHex(hex: string): [number, number, number] | null {
+  const r = /^#?([0-9a-f]{6})$/i.exec(hex)
+  if (!r) return null
+  const n = parseInt(r[1], 16)
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255]
 }
 
 export function toJpegDataUrl(canvas: HTMLCanvasElement, quality = 0.92): string {
