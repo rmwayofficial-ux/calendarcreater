@@ -169,8 +169,22 @@ export default function App() {
   return (
     <div className="app">
       <header className="topbar">
-        <h1>予約状況カレンダー作成</h1>
-        <p className="sub">午前・午後のマスをタップして ◎○△× を切り替え → JPEGでダウンロード</p>
+        <span className="brand-logo" aria-hidden>
+          <svg width="40" height="40" viewBox="0 0 40 40">
+            <rect x="2" y="2" width="36" height="36" rx="11" fill="#4ab4aa" />
+            <g stroke="#ffffff" strokeWidth="2.4" fill="none" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="9" y="12" width="22" height="18" rx="3.5" />
+              <line x1="9" y1="18" x2="31" y2="18" />
+              <line x1="15" y1="8" x2="15" y2="13" />
+              <line x1="25" y1="8" x2="25" y2="13" />
+            </g>
+            <circle cx="20" cy="24.5" r="2.6" fill="#ffffff" />
+          </svg>
+        </span>
+        <div className="brand-text">
+          <h1>予約状況カレンダー作成</h1>
+          <p className="sub">AM・PM のマスをタップして ◎○△× を切り替え → JPEGでダウンロード</p>
+        </div>
       </header>
 
       <div className="layout">
