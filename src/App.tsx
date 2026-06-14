@@ -53,6 +53,9 @@ export default function App() {
   // 出力サイズ（投稿先：ブログ／Facebook／Instagram）
   const [formatId, setFormatId] = useState<string>(() => loadFormatId() ?? 'blog')
 
+  // 前回の「ファイルに保存」以降に編集があるか（未バックアップ＝終了時に警告）
+  const [unsavedToFile, setUnsavedToFile] = useState(false)
+
   // 初回ガイド（はじめて使う人向けの説明。閉じると次回から出ない）
   const [showIntro, setShowIntro] = useState(() => !loadIntroSeen())
   const dismissIntro = () => {
@@ -98,10 +101,22 @@ export default function App() {
     if (canvasRef.current) drawCalendar(canvasRef.current, data, theme, formatId)
   }, [data, theme, formatId])
 
+  // 終了（ブラウザ／タブを閉じる・再読み込み）時、ファイル未保存の編集があれば警告する
+  useEffect(() => {
+    const handler = (e: BeforeUnloadEvent) => {
+      if (!unsavedToFile) return
+      e.preventDefault()
+      e.returnValue = ''
+    }
+    window.addEventListener('beforeunload', handler)
+    return () => window.removeEventListener('beforeunload', handler)
+  }, [unsavedToFile])
+
   const weeks = useMemo(() => buildWeeks(year, month), [year, month])
 
   const update = useCallback((patch: Partial<CalendarData>) => {
     setData((d) => ({ ...d, ...patch }))
+    setUnsavedToFile(true)
   }, [])
 
   const cycleSlot = useCallback((day: number, slot: 'am' | 'pm') => {
@@ -110,6 +125,7 @@ export default function App() {
       const updated = { ...cur, [slot]: nextMark(cur[slot]) }
       return { ...d, marks: { ...d.marks, [day]: updated } }
     })
+    setUnsavedToFile(true)
   }, [])
 
   const updateNote = useCallback((day: number, note: string) => {
@@ -117,6 +133,7 @@ export default function App() {
       const cur = d.marks[day] ?? emptyDay()
       return { ...d, marks: { ...d.marks, [day]: { ...cur, note } } }
     })
+    setUnsavedToFile(true)
   }, [])
 
   const goMonth = (delta: number) => {
@@ -143,11 +160,13 @@ export default function App() {
       ...d,
       marks: structuredClone(prev.marks),
     }))
+    setUnsavedToFile(true)
   }
 
   const clearAll = () => {
     if (confirm('この月のマークをすべて消去します。よろしいですか？')) {
       setData((d) => ({ ...d, marks: {} }))
+      setUnsavedToFile(true)
     }
   }
 
@@ -161,6 +180,7 @@ export default function App() {
       for (const day of days) marks[day] = { ...(marks[day] ?? emptyDay()), am: bulkMark, pm: bulkMark }
       return { ...d, marks }
     })
+    setUnsavedToFile(true)
   }
 
   const download = () => {
@@ -184,6 +204,7 @@ export default function App() {
     a.download = `カレンダー_バックアップ_${stamp}.json`
     a.click()
     URL.revokeObjectURL(url)
+    setUnsavedToFile(false)
   }
 
   // ファイルから読み込み
@@ -196,6 +217,7 @@ export default function App() {
         const res = importAll(String(reader.result))
         if (res.themeId) setThemeId(res.themeId)
         setData(loadMonth(year, month) ?? freshData(year, month))
+        setUnsavedToFile(false)
         alert(`${res.count}か月分のデータを読み込みました。`)
       } catch {
         alert('ファイルを読み込めませんでした。正しいバックアップファイル（.json）か確認してください。')
@@ -312,7 +334,9 @@ export default function App() {
           </div>
 
           <div className="filebar">
-            <button onClick={exportFile}>💾 ファイルに保存</button>
+            <button className={`save-file ${unsavedToFile ? 'attention' : ''}`} onClick={exportFile}>
+              💾 ファイルに保存{unsavedToFile ? '（未保存）' : ''}
+            </button>
             <button onClick={() => fileInputRef.current?.click()}>📂 ファイルから読み込み</button>
             <input
               ref={fileInputRef}
@@ -322,6 +346,13 @@ export default function App() {
               style={{ display: 'none' }}
             />
           </div>
+          {unsavedToFile && (
+            <p className="save-reminder">
+              ⚠️ 前回のファイル保存から変更があります。終了する前に「💾 ファイルに保存」でバックアップしておくと安心です。
+              <br />
+              <small>※ 入力内容はこの端末にも自動保存されています。ファイル保存は別端末への移行・万一の消失に備えたバックアップです。</small>
+            </p>
+          )}
 
           <div className="tools">
             <button onClick={copyPrevMonth}>前月をコピー</button>
