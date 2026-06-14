@@ -114,6 +114,17 @@ export default function App() {
 
   const weeks = useMemo(() => buildWeeks(year, month), [year, month])
 
+  // 年の選択肢。端末の「今年」を基準に毎年自動で前へ進む（去年〜10年先）。
+  // ◀▶ でそれ以上先へ進んだ場合も、その年を必ず含めて未来永劫使えるようにする。
+  const yearOptions = useMemo(() => {
+    const cy = now.getFullYear()
+    const start = Math.min(cy - 1, year)
+    const end = Math.max(cy + 10, year)
+    const arr: number[] = []
+    for (let y = start; y <= end; y++) arr.push(y)
+    return arr
+  }, [year])
+
   const update = useCallback((patch: Partial<CalendarData>) => {
     setData((d) => ({ ...d, ...patch }))
     setUnsavedToFile(true)
@@ -314,7 +325,7 @@ export default function App() {
           <div className="monthnav">
             <button onClick={() => goMonth(-1)} aria-label="前の月">◀</button>
             <select value={year} onChange={(e) => setYear(Number(e.target.value))}>
-              {Array.from({ length: 7 }, (_, i) => now.getFullYear() - 1 + i).map((y) => (
+              {yearOptions.map((y) => (
                 <option key={y} value={y}>{y}年</option>
               ))}
             </select>
