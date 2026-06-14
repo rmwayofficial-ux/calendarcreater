@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { buildWeeks, daysOfWeekday, WEEKDAY_LABELS } from './calendar'
 import { drawCalendar, toJpegDataUrl } from './renderCanvas'
-import { loadMonth, loadPreviousMonth, saveMonth } from './storage'
+import { exportAll, importAll, loadMonth, loadPreviousMonth, loadThemeId, saveMonth, saveThemeId } from './storage'
+import { THEMES, themeById } from './theme'
 import {
   emptyDay,
   MARK_CYCLE,
@@ -32,8 +33,11 @@ export default function App() {
   const [year, setYear] = useState(now.getFullYear())
   const [month, setMonth] = useState(now.getMonth() + 1)
   const [data, setData] = useState<CalendarData>(() => loadMonth(year, month) ?? freshData(year, month))
+  const [themeId, setThemeId] = useState<string>(() => loadThemeId() ?? 'soft')
+  const theme = useMemo(() => themeById(themeId), [themeId])
 
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   // 年月切替時にその月のデータを読み込む（無ければ新規）
   useEffect(() => {
@@ -45,10 +49,15 @@ export default function App() {
     saveMonth(data)
   }, [data])
 
+  // テーマの保存
+  useEffect(() => {
+    saveThemeId(themeId)
+  }, [themeId])
+
   // プレビュー（=ダウンロード画像）を再描画
   useEffect(() => {
-    if (canvasRef.current) drawCalendar(canvasRef.current, data)
-  }, [data])
+    if (canvasRef.current) drawCalendar(canvasRef.current, data, theme)
+  }, [data, theme])
 
   const weeks = useMemo(() => buildWeeks(year, month), [year, month])
 
@@ -125,6 +134,38 @@ export default function App() {
     a.click()
   }
 
+  // 全データをファイルに保存（バックアップ／別端末への移行・共有）
+  const exportFile = () => {
+    const d = new Date()
+    const stamp = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`
+    const blob = new Blob([exportAll(d.toISOString())], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `カレンダー_バックアップ_${stamp}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  // ファイルから読み込み
+  const importFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = () => {
+      try {
+        const res = importAll(String(reader.result))
+        if (res.themeId) setThemeId(res.themeId)
+        setData(loadMonth(year, month) ?? freshData(year, month))
+        alert(`${res.count}か月分のデータを読み込みました。`)
+      } catch {
+        alert('ファイルを読み込めませんでした。正しいバックアップファイル（.json）か確認してください。')
+      }
+    }
+    reader.readAsText(file)
+    e.target.value = ''
+  }
+
   return (
     <div className="app">
       <header className="topbar">
@@ -155,6 +196,34 @@ export default function App() {
               タイトル
               <input value={data.title} onChange={(e) => update({ title: e.target.value })} placeholder="6月の予約状況" />
             </label>
+          </div>
+
+          <div className="theme-row">
+            <span className="theme-label">デザイン</span>
+            <div className="theme-options">
+              {THEMES.map((t) => (
+                <button
+                  key={t.id}
+                  className={`theme-btn ${themeId === t.id ? 'active' : ''}`}
+                  onClick={() => setThemeId(t.id)}
+                  title={t.hint}
+                >
+                  {t.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="filebar">
+            <button onClick={exportFile}>💾 ファイルに保存</button>
+            <button onClick={() => fileInputRef.current?.click()}>📂 ファイルから読み込み</button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="application/json,.json"
+              onChange={importFile}
+              style={{ display: 'none' }}
+            />
           </div>
 
           <div className="tools">

@@ -30,3 +30,81 @@ export function loadPreviousMonth(year: number, month: number): CalendarData | n
   const prevYear = month === 1 ? year - 1 : year
   return loadMonth(prevYear, prevMonth)
 }
+
+// ===== テーマの保存 =====
+const THEME_KEY = 'calcreate:theme'
+
+export function loadThemeId(): string | null {
+  try {
+    return localStorage.getItem(THEME_KEY)
+  } catch {
+    return null
+  }
+}
+
+export function saveThemeId(id: string): void {
+  try {
+    localStorage.setItem(THEME_KEY, id)
+  } catch {
+    // 無視
+  }
+}
+
+// ===== ファイル保存・読み込み（バックアップ／別端末への移行・共有）=====
+interface BackupFile {
+  app: 'calendarcreater'
+  version: 1
+  exportedAt: string
+  themeId?: string
+  months: CalendarData[]
+}
+
+// 保存済みの全月データを集めて JSON 文字列にする
+export function exportAll(exportedAt: string): string {
+  const months: CalendarData[] = []
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i)
+      if (!key || !key.startsWith(PREFIX)) continue
+      const raw = localStorage.getItem(key)
+      if (!raw) continue
+      try {
+        months.push(JSON.parse(raw) as CalendarData)
+      } catch {
+        // 壊れたエントリはスキップ
+      }
+    }
+  } catch {
+    // localStorage 不可
+  }
+  months.sort((a, b) => a.year - b.year || a.month - b.month)
+  const data: BackupFile = {
+    app: 'calendarcreater',
+    version: 1,
+    exportedAt,
+    themeId: loadThemeId() ?? undefined,
+    months,
+  }
+  return JSON.stringify(data, null, 2)
+}
+
+// バックアップ JSON を読み込んで localStorage に書き込む。読み込んだ月数を返す。
+export function importAll(json: string): { count: number; themeId?: string } {
+  const parsed = JSON.parse(json) as Partial<BackupFile>
+  if (!parsed || parsed.app !== 'calendarcreater' || !Array.isArray(parsed.months)) {
+    throw new Error('invalid backup file')
+  }
+  let count = 0
+  for (const m of parsed.months) {
+    if (typeof m?.year !== 'number' || typeof m?.month !== 'number') continue
+    saveMonth({
+      year: m.year,
+      month: m.month,
+      title: typeof m.title === 'string' ? m.title : `${m.month}月の予約状況`,
+      marks: m.marks ?? {},
+    })
+    count++
+  }
+  if (typeof parsed.themeId === 'string') saveThemeId(parsed.themeId)
+  return { count, themeId: parsed.themeId }
+}

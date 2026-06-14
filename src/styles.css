@@ -115,6 +115,49 @@ button:hover {
   background: #f3efe6;
 }
 
+/* デザイン（テーマ）選択 */
+.theme-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.theme-label {
+  font-size: 13px;
+  color: var(--muted);
+  font-weight: 600;
+}
+.theme-options {
+  display: flex;
+  gap: 6px;
+  flex: 1;
+}
+.theme-btn {
+  flex: 1;
+  height: 40px;
+  font-size: 14px;
+  border-radius: 10px;
+}
+.theme-btn.active {
+  background: #4ab4aa;
+  color: #fff;
+  border-color: #4ab4aa;
+  font-weight: 700;
+}
+
+/* ファイル保存・読み込み */
+.filebar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.filebar button {
+  flex: 1;
+  height: 42px;
+  font-size: 14px;
+  border-radius: 10px;
+}
+
 /* ツール */
 .tools {
   display: flex;
