@@ -1,6 +1,6 @@
 {
-  "name": "Calendar Creator",
-  "short_name": "Calendar",
+  "name": "カレンダークリエイター",
+  "short_name": "カレンダー",
   "description": "予約状況カレンダーを作成してJPEGでダウンロードできるアプリ",
   "start_url": "./",
   "scope": "./",

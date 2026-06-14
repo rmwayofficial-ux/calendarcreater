@@ -193,7 +193,7 @@ export default function App() {
           </svg>
         </span>
         <div className="brand-text">
-          <h1>Calendar Creator</h1>
+          <h1>カレンダークリエイター</h1>
           <p className="sub">午前・午後のマスをタップして ◎○△× を切り替え → JPEGでダウンロード</p>
         </div>
       </header>
