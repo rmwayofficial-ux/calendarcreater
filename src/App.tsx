@@ -1,7 +1,19 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { buildWeeks, daysOfWeekday, WEEKDAY_LABELS } from './calendar'
+import Guide from './Guide'
+import Help from './Help'
 import { drawCalendar, toJpegDataUrl } from './renderCanvas'
-import { exportAll, importAll, loadMonth, loadPreviousMonth, loadThemeId, saveMonth, saveThemeId } from './storage'
+import {
+  exportAll,
+  importAll,
+  loadIntroSeen,
+  loadMonth,
+  loadPreviousMonth,
+  loadThemeId,
+  saveIntroSeen,
+  saveMonth,
+  saveThemeId,
+} from './storage'
 import { THEMES, themeById } from './theme'
 import {
   emptyDay,
@@ -35,6 +47,23 @@ export default function App() {
   const [data, setData] = useState<CalendarData>(() => loadMonth(year, month) ?? freshData(year, month))
   const [themeId, setThemeId] = useState<string>(() => loadThemeId() ?? 'soft')
   const theme = useMemo(() => themeById(themeId), [themeId])
+
+  // 初回ガイド（はじめて使う人向けの説明。閉じると次回から出ない）
+  const [showIntro, setShowIntro] = useState(() => !loadIntroSeen())
+  const dismissIntro = () => {
+    setShowIntro(false)
+    saveIntroSeen()
+  }
+
+  // スマホ・小画面用：編集／プレビューを切り替えるタブ（上下スクロールの行き来を減らす）
+  const [mobileView, setMobileView] = useState<'edit' | 'preview'>('edit')
+
+  // ページ切り替え（カレンダー作成／使い方／ヘルプ）
+  const [page, setPage] = useState<'app' | 'guide' | 'help'>('app')
+  const goPage = (p: 'app' | 'guide' | 'help') => {
+    setPage(p)
+    window.scrollTo(0, 0)
+  }
 
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -196,9 +225,58 @@ export default function App() {
           <h1>カレンダークリエイター</h1>
           <p className="sub">午前・午後のマスをタップして ◎○△× を切り替え → JPEGでダウンロード</p>
         </div>
+        <nav className="topnav">
+          <button className={page === 'app' ? 'active' : ''} onClick={() => goPage('app')}>カレンダー作成</button>
+          <button className={page === 'guide' ? 'active' : ''} onClick={() => goPage('guide')}>使い方</button>
+          <button className={page === 'help' ? 'active' : ''} onClick={() => goPage('help')}>ヘルプ</button>
+        </nav>
       </header>
 
-      <div className="layout">
+      {page === 'guide' && <Guide onBack={() => goPage('app')} />}
+      {page === 'help' && <Help onBack={() => goPage('app')} />}
+
+      {page === 'app' && showIntro && (
+        <div className="intro" role="note">
+          <button className="intro-close" onClick={dismissIntro} aria-label="この説明を閉じる">×</button>
+          <h2>はじめての方へ</h2>
+          <p>
+            これは<strong>「お店の予約状況」をひと目で伝える画像をつくるアプリ</strong>です。
+            日にちごとに <b>午前／午後</b> の空き具合を <b>◎○△×</b> でポチポチ選ぶと、
+            きれいなカレンダー画像ができあがります。
+          </p>
+          <p className="intro-steps">
+            <span>① 月とタイトルを選ぶ</span>
+            <span>② 各日の午前・午後をタップ</span>
+            <span>③ 「📥 JPEGをダウンロード」</span>
+            <span>④ ブログやSNSに貼るだけ</span>
+          </p>
+          <button className="intro-ok" onClick={dismissIntro}>はじめる</button>
+        </div>
+      )}
+
+      {page === 'app' && (
+        <>
+      {/* スマホ・小画面：編集とプレビューをタブで切り替え（行き来のスクロールを減らす） */}
+      <div className="viewtabs" role="tablist">
+        <button
+          role="tab"
+          aria-selected={mobileView === 'edit'}
+          className={mobileView === 'edit' ? 'active' : ''}
+          onClick={() => setMobileView('edit')}
+        >
+          ✏️ 編集
+        </button>
+        <button
+          role="tab"
+          aria-selected={mobileView === 'preview'}
+          className={mobileView === 'preview' ? 'active' : ''}
+          onClick={() => setMobileView('preview')}
+        >
+          👁 プレビュー
+        </button>
+      </div>
+
+      <div className="layout" data-view={mobileView}>
         {/* 左：編集パネル */}
         <section className="editor">
           <div className="monthnav">
@@ -221,22 +299,6 @@ export default function App() {
               タイトル
               <input value={data.title} onChange={(e) => update({ title: e.target.value })} placeholder="6月の予約状況" />
             </label>
-          </div>
-
-          <div className="theme-row">
-            <span className="theme-label">デザイン</span>
-            <div className="theme-options">
-              {THEMES.map((t) => (
-                <button
-                  key={t.id}
-                  className={`theme-btn ${themeId === t.id ? 'active' : ''}`}
-                  onClick={() => setThemeId(t.id)}
-                  title={t.hint}
-                >
-                  {t.label}
-                </button>
-              ))}
-            </div>
           </div>
 
           <div className="filebar">
@@ -323,6 +385,21 @@ export default function App() {
             <button className="download" onClick={download}>📥 JPEGをダウンロード</button>
           </div>
           <p className="hint">この画像がそのまま保存されます（ブログにアップしてください）。</p>
+
+          <div className="design-row">
+            <span className="design-label">デザイン</span>
+            {THEMES.map((t) => (
+              <button
+                key={t.id}
+                className={`design-btn ${themeId === t.id ? 'active' : ''}`}
+                onClick={() => setThemeId(t.id)}
+                title={t.hint}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
+
           <canvas ref={canvasRef} className="preview-canvas" />
           <div className="legend">
             {MARK_CYCLE.filter((m) => m !== 'none').map((m) => (
@@ -333,8 +410,15 @@ export default function App() {
           </div>
         </section>
       </div>
+        </>
+      )}
 
       <footer className="foot">
+        <nav className="footnav">
+          <button onClick={() => goPage('guide')}>使い方</button>
+          <span aria-hidden>・</span>
+          <button onClick={() => goPage('help')}>ヘルプ</button>
+        </nav>
         データはこのブラウザにのみ保存されます（サーバーには送信されません）。
       </footer>
     </div>

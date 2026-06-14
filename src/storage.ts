@@ -50,6 +50,25 @@ export function saveThemeId(id: string): void {
   }
 }
 
+// ===== 初回ガイドの表示状態 =====
+const INTRO_KEY = 'calcreate:introSeen'
+
+export function loadIntroSeen(): boolean {
+  try {
+    return localStorage.getItem(INTRO_KEY) === '1'
+  } catch {
+    return false
+  }
+}
+
+export function saveIntroSeen(): void {
+  try {
+    localStorage.setItem(INTRO_KEY, '1')
+  } catch {
+    // 無視
+  }
+}
+
 // ===== ファイル保存・読み込み（バックアップ／別端末への移行・共有）=====
 interface BackupFile {
   app: 'calendarcreater'

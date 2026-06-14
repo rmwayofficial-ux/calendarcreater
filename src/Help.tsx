@@ -1,0 +1,79 @@
+// ヘルプ（よくある質問）ページ。困ったときの確認事項をまとめる。
+
+export default function Help({ onBack }: { onBack: () => void }) {
+  return (
+    <article className="page">
+      <div className="page-head">
+        <button className="page-back" onClick={onBack}>← カレンダー作成にもどる</button>
+        <h1>ヘルプ・よくある質問</h1>
+      </div>
+
+      <section className="page-sec">
+        <h2>入力した内容はどこに保存されますか？</h2>
+        <p>
+          お使いの端末（ブラウザ）の中だけに保存されます。インターネットやサーバーには送信されません。
+          そのため、<b>同じ端末・同じブラウザ</b>で開けば、前回の続きから使えます。
+        </p>
+      </section>
+
+      <section className="page-sec">
+        <h2>別の端末やスマホでも同じ内容を使いたい</h2>
+        <p>
+          編集パネルの <b>「💾 ファイルに保存」</b> でデータを <code>.json</code> ファイルとして書き出し、
+          別の端末で <b>「📂 ファイルから読み込み」</b> から読み込んでください。内容がそのまま復元されます。
+          機種変更の前などのバックアップにも使えます。
+        </p>
+      </section>
+
+      <section className="page-sec">
+        <h2>入力した内容が消えてしまいました</h2>
+        <ul className="page-list">
+          <li>ブラウザの「履歴・データの消去」を行うと、保存内容も一緒に消えることがあります。</li>
+          <li>シークレット（プライベート）モードでは保存されません。通常のモードでお使いください。</li>
+          <li>大切な内容は、こまめに <b>「💾 ファイルに保存」</b> でバックアップしておくと安心です。</li>
+        </ul>
+      </section>
+
+      <section className="page-sec">
+        <h2>ダウンロードした画像が見つかりません</h2>
+        <p>
+          多くの場合、端末の「ダウンロード」フォルダや、写真アプリ・ファイルアプリの中にあります。
+          ファイル名は <code>予約状況_2026-06.jpg</code> のように、年月が付いています。
+        </p>
+      </section>
+
+      <section className="page-sec">
+        <h2>祝日について</h2>
+        <p>
+          日曜始まりのカレンダーで、祝日（振替休日・国民の休日を含む／1980〜2099年）は自動で赤く表示されます。
+          祝日名もマスに小さく表示されます。
+        </p>
+      </section>
+
+      <section className="page-sec">
+        <h2>デザインを変えても記号の色が同じです</h2>
+        <p>
+          ◎（赤）・○（緑）・△（青）・×（濃いグレー）は<b>意味を表す色</b>なので、どのデザインでも共通です。
+          デザインで変わるのは、背景・枠・角の丸み・季節イラストの有無などです。
+        </p>
+      </section>
+
+      <section className="page-sec">
+        <h2>スマホで下のほうが見えない・操作しづらい</h2>
+        <p>
+          上部の <b>「✏️ 編集 / 👁 プレビュー」</b> タブで表示を切り替えてお使いください。
+          編集とプレビューを別々に表示するので、長い上下スクロールが不要になります。
+        </p>
+      </section>
+
+      <section className="page-sec">
+        <h2>もっとくわしい操作を知りたい</h2>
+        <p>ページ上部のメニューから <b>「使い方」</b> をご覧ください。操作の流れを順番に説明しています。</p>
+      </section>
+
+      <div className="page-foot">
+        <button className="page-back" onClick={onBack}>← カレンダー作成にもどる</button>
+      </div>
+    </article>
+  )
+}

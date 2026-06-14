@@ -75,6 +75,200 @@ body {
   color: var(--muted);
   font-size: 14px;
 }
+.topnav {
+  margin-left: auto;
+  display: flex;
+  gap: 6px;
+  flex: 0 0 auto;
+}
+.topnav button {
+  height: 38px;
+  padding: 0 14px;
+  font-size: 13.5px;
+  font-weight: 600;
+  border-radius: 999px;
+  color: var(--text);
+}
+.topnav button.active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+@media (max-width: 600px) {
+  .topbar {
+    flex-wrap: wrap;
+  }
+  .topnav {
+    margin-left: 0;
+    width: 100%;
+    order: 3;
+  }
+  .topnav button {
+    flex: 1;
+  }
+}
+
+/* フッターのリンク */
+.footnav {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+.footnav button {
+  border: none;
+  background: transparent;
+  color: var(--accent-press);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 4px 6px;
+  text-decoration: underline;
+}
+.footnav button:hover {
+  background: transparent;
+  color: var(--accent);
+}
+
+/* 使い方／ヘルプ ページ */
+.page {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 26px 28px 30px;
+  box-shadow: var(--shadow);
+  max-width: 820px;
+  margin: 0 auto;
+}
+.page-head {
+  margin-bottom: 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--line);
+}
+.page-head h1 {
+  font-size: 24px;
+  margin: 10px 0 0;
+  color: var(--text);
+}
+.page-back {
+  border: none;
+  background: transparent;
+  color: var(--accent-press);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 4px 0;
+}
+.page-back:hover {
+  background: transparent;
+  color: var(--accent);
+}
+.page-lead {
+  font-size: 15px;
+  line-height: 1.8;
+  color: var(--text);
+  background: #f3faf9;
+  border: 1px solid #d7ece9;
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+.page-lead strong {
+  color: var(--accent-press);
+}
+.page-sec {
+  margin-top: 24px;
+}
+.page-sec h2 {
+  font-size: 17px;
+  color: var(--accent-press);
+  margin: 0 0 10px;
+  padding-left: 10px;
+  border-left: 4px solid var(--accent);
+}
+.page-sec p {
+  font-size: 14.5px;
+  line-height: 1.8;
+  margin: 0 0 10px;
+}
+.page-steps {
+  margin: 0;
+  padding-left: 22px;
+  display: grid;
+  gap: 12px;
+}
+.page-steps li {
+  font-size: 14.5px;
+  line-height: 1.7;
+}
+.page-list {
+  margin: 0;
+  padding-left: 20px;
+  display: grid;
+  gap: 8px;
+}
+.page-list li {
+  font-size: 14.5px;
+  line-height: 1.7;
+}
+.page code {
+  background: #eef1f4;
+  border-radius: 6px;
+  padding: 1px 6px;
+  font-size: 13px;
+}
+.nowrap {
+  white-space: nowrap;
+  font-weight: 700;
+}
+.page-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14.5px;
+}
+.page-table th,
+.page-table td {
+  border: 1px solid var(--line);
+  padding: 8px 12px;
+  text-align: left;
+}
+.page-table th {
+  background: #f3f5f8;
+  color: var(--muted);
+  font-size: 13px;
+}
+.page-table td:first-child {
+  width: 64px;
+  text-align: center;
+  font-size: 20px;
+  font-weight: 700;
+}
+.page-table .m-double {
+  color: var(--double);
+}
+.page-table .m-circle {
+  color: var(--circle);
+}
+.page-table .m-triangle {
+  color: var(--triangle);
+}
+.page-table .m-cross {
+  color: var(--cross);
+}
+.page-table .m-none {
+  color: var(--none);
+}
+.page-foot {
+  margin-top: 26px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+@media (max-width: 600px) {
+  .page {
+    padding: 18px 16px 22px;
+  }
+  .page-head h1 {
+    font-size: 20px;
+  }
+}
 
 .layout {
   display: grid;
@@ -85,6 +279,109 @@ body {
 @media (max-width: 900px) {
   .layout {
     grid-template-columns: 1fr;
+  }
+}
+
+/* はじめての方へ（初回ガイド） */
+.intro {
+  position: relative;
+  background: linear-gradient(180deg, #effaf8, #ffffff);
+  border: 1px solid #cfeae6;
+  border-radius: var(--radius);
+  padding: 18px 20px 20px;
+  margin-bottom: 18px;
+  box-shadow: var(--shadow);
+}
+.intro h2 {
+  margin: 0 0 8px;
+  font-size: 17px;
+  color: var(--accent-press);
+}
+.intro p {
+  margin: 0 0 10px;
+  font-size: 14.5px;
+  line-height: 1.7;
+  color: var(--text);
+}
+.intro strong {
+  color: var(--accent-press);
+}
+.intro-steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.intro-steps span {
+  background: #fff;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent-press);
+}
+.intro-ok {
+  height: 40px;
+  padding: 0 22px;
+  margin-top: 12px;
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+  font-weight: 700;
+}
+.intro-ok:hover {
+  background: var(--accent-press);
+}
+.intro-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  font-size: 22px;
+  line-height: 1;
+  color: var(--muted);
+}
+.intro-close:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+/* 編集／プレビュー切り替えタブ（小画面のみ表示） */
+.viewtabs {
+  display: none;
+}
+@media (max-width: 900px) {
+  .viewtabs {
+    display: flex;
+    gap: 6px;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: var(--bg);
+    padding: 8px 0;
+    margin-bottom: 10px;
+  }
+  .viewtabs button {
+    flex: 1;
+    height: 46px;
+    font-size: 15px;
+    font-weight: 700;
+    border-radius: 12px;
+  }
+  .viewtabs button.active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+  /* タブで選ばれた側だけを表示（上下スクロールの行き来をなくす） */
+  .layout[data-view='edit'] .preview {
+    display: none;
+  }
+  .layout[data-view='preview'] .editor {
+    display: none;
   }
 }
 
@@ -175,36 +472,34 @@ textarea:focus {
   font-weight: 400;
 }
 
-/* デザイン（テーマ）選択 */
-.theme-row {
+/* デザイン（テーマ）選択：プレビューの近くに小さく置く。最初に一度選べば十分なため。 */
+.design-row {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 14px;
+  gap: 6px;
+  margin: 0 0 12px;
+  flex-wrap: wrap;
 }
-.theme-label {
-  font-size: 12px;
+.design-label {
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.02em;
   color: var(--muted);
-  flex: 0 0 auto;
+  margin-right: 2px;
 }
-.theme-options {
-  display: flex;
-  gap: 6px;
-  flex: 1;
+.design-btn {
+  height: 30px;
+  padding: 0 12px;
+  font-size: 12.5px;
+  border-radius: 999px;
 }
-.theme-btn {
-  flex: 1;
-  height: 42px;
-}
-.theme-btn.active {
+.design-btn.active {
   background: var(--accent);
   color: #fff;
   border-color: var(--accent);
   font-weight: 700;
 }
-.theme-btn.active:hover {
+.design-btn.active:hover {
   background: var(--accent-press);
 }
 
@@ -442,4 +737,98 @@ textarea:focus {
   color: var(--muted);
   font-size: 12px;
   margin-top: 28px;
+}
+
+/* ===== スマホ・小画面の快適化 ===== */
+@media (max-width: 600px) {
+  .app {
+    padding: 14px 10px 32px;
+  }
+  .topbar {
+    gap: 10px;
+    margin-bottom: 14px;
+    padding-bottom: 12px;
+  }
+  .topbar h1 {
+    font-size: 19px;
+  }
+  .topbar .sub {
+    font-size: 12.5px;
+  }
+
+  .editor,
+  .preview {
+    padding: 14px;
+  }
+
+  /* タッチしやすいよう各操作を大きめに */
+  .monthnav button {
+    width: 46px;
+    height: 46px;
+  }
+  .monthnav select,
+  .fields input,
+  .filebar button,
+  .tools > button,
+  .bulk select,
+  .bulk button {
+    height: 46px;
+    font-size: 15px;
+  }
+
+  /* カレンダーのマスをタップしやすく */
+  .cell {
+    min-height: auto;
+    padding: 3px;
+  }
+  .slot {
+    height: 40px;
+    padding: 2px 10px;
+  }
+  .slot-label {
+    font-size: 11px;
+  }
+  .slot-mark {
+    font-size: 20px;
+  }
+  .note-input {
+    font-size: 12px;
+    min-height: 30px;
+  }
+  .daynum {
+    font-size: 14px;
+  }
+
+  /* プレビュー画像が画面内に収まりやすいように */
+  .preview-canvas {
+    max-height: 56vh;
+    object-fit: contain;
+  }
+  .preview-head h2 {
+    font-size: 15px;
+  }
+  .download {
+    height: 46px;
+  }
+  .legend {
+    gap: 10px;
+    font-size: 12px;
+  }
+
+  .intro {
+    padding: 14px 14px 16px;
+  }
+  .intro p {
+    font-size: 14px;
+  }
+}
+
+/* 横向きスマホなど低い画面：ガイドや余白を控えめに */
+@media (max-height: 560px) and (max-width: 900px) {
+  .topbar {
+    margin-bottom: 10px;
+  }
+  .preview-canvas {
+    max-height: 70vh;
+  }
 }

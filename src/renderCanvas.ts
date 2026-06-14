@@ -105,8 +105,10 @@ export function drawCalendar(canvas: HTMLCanvasElement, data: CalendarData, them
   ctx.fillStyle = T.seasonTint ? season.tint : T.plainBg
   ctx.fillRect(0, 0, W, H)
 
-  // 余白に季節モチーフ（毎月ちがう絵柄・色）
-  drawDecorations(ctx, season.key, season.accent, { x: cardX, y: cardY, w: cardW, h: cardH }, W, H)
+  // 余白に季節モチーフ（毎月ちがう絵柄・色）。クール等 motif=false のテーマは背景の色のみ。
+  if (T.motif) {
+    drawDecorations(ctx, season.key, season.accent, { x: cardX, y: cardY, w: cardW, h: cardH }, W, H)
+  }
 
   // 白いカード
   ctx.save()
