@@ -118,6 +118,26 @@ npm run build   # 型チェック＋本番ビルド（push前の確認に）
 
 ### よくある調整ポイント
 - マークの色：`renderCanvas.ts` の `MARK_INK`（編集画面側は `styles.css` の `--double` 等）
-- テーマの色・枠線・季節イラストの寄せ具合：`theme.ts`
-- 季節モチーフの絵柄：`season.ts`
+- テーマの色・罫線（経線）の太さ/色・季節あしらいの寄せ具合：`theme.ts`
+- 季節モチーフの絵柄：`season.ts`（`drawSeasonMotif`）／配置・濃さ：`renderCanvas.ts` の `drawDecorations`
 - レイアウト寸法（行高・余白・見出しサイズ）：`renderCanvas.ts` 上部の定数
+- 出力サイズ（ブログ/Facebook/Instagram の縦横比）：`renderCanvas.ts` の `FORMATS`
+- 年の選択範囲（今年-1〜+5年・自動前進）：`App.tsx` の `yearOptions`
+- 見出し（年・タイトル・区切り線）：`renderCanvas.ts` の見出しブロック
+
+### 実装済みの主な機能（場所）
+- 初回ガイド／使い方・ヘルプページ：`App.tsx`（`page` 状態）＋ `Guide.tsx` / `Help.tsx`
+- 出力デザイン「ナチュラル上品」：`renderCanvas.ts` ＋ `theme.ts`（4テーマ）＋ `season.ts`（淡い季節色）
+- 出力サイズ切替（自動保存・ファイル名に付与）：`FORMATS` ＋ `storage.ts`（`loadFormatId`/`saveFormatId`）
+- スマホ最適化（編集/プレビュー タブ・サイズ/デザインを一列・補助操作の並び替え）：`styles.css` のメディアクエリ＋`App.tsx`（`mobileView`）
+- 終了時の未保存ガード（`beforeunload`）＋保存ボタン強調：`App.tsx`（`unsavedToFile`）
+- マーク：空白は横棒「−」＝受付不可（`renderCanvas.ts` の `drawSlot` ／ `types.ts` の `MARK_LABEL`）
+
+### 出力画像の見た目を手元で確認する方法（ブラウザ不要）
+ローカルに `@napi-rs/canvas`（ネイティブ依存なしのprebuilt）を一時導入すると、Node から `drawCalendar` を呼んでPNGを書き出せる。
+```bash
+npm i --no-save @napi-rs/canvas
+# 1) ./node_modules/.bin/esbuild で renderCanvas を Node 向けに bundle（entry で drawCalendar/THEMES を re-export）
+# 2) createCanvas(10,10) を drawCalendar(canvas, data, theme, formatId) に渡し canvas.toBuffer('image/png') を保存
+```
+注意：この方法は日本語フォントと ◎○△ の字形が無い環境だと文字が□になる（レイアウト・配色・罫線・余白の確認用）。文字や記号の最終確認は実ブラウザ（`npm run dev` の右側プレビュー）で行う。
