@@ -84,8 +84,8 @@ export const THEMES: Theme[] = [
   {
     id: 'plain',
     label: 'シャープ',
-    hint: 'シャープで明瞭。濃いチャコールの罫線でパキッと締まる',
-    // パキッと締まったシルエットになるよう、ink・accent・罫線をぐっと濃く。
+    hint: 'ディープネイビー背景に白カードが浮かぶ、シャープでスタイリッシュな仕上がり',
+    // カード内（白背景上）の文字・罫線はそのままダーク系で読みやすく。
     accent: '#1B2430',
     ink: '#0F1620',
     frame: '#1F2A37',
@@ -96,12 +96,13 @@ export const THEMES: Theme[] = [
     cardBg: '#FFFFFF',
     cardRadius: 4,
     gridRadius: 2,
-    shadowBlur: 0,
-    shadowColor: 'rgba(0,0,0,0)',
+    // 白カードがネイビーに浮き立つよう、控えめな影を足す
+    shadowBlur: 22,
+    shadowColor: 'rgba(0,0,0,0.45)',
     seasonTint: false,
     motif: false,
-    // 背景はクールよりやや濃いめのスレートでさらに差をつける
-    plainBg: '#D3D8E0',
+    // ディープネイビー背景。白カードとのコントラストでパキッと締まる
+    plainBg: '#142540',
     decoBlend: '#3A4654',
     decoBlendAmt: 0.4,
     decoAlpha: 1,
