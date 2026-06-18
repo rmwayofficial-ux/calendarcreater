@@ -125,6 +125,33 @@ export const THEMES: Theme[] = [
     decoAlpha: 1,
     decoScale: 1,
   },
+  {
+    id: 'pop',
+    label: 'ビタミン',
+    hint: 'ビタミンカラーで元気いっぱい。明るくポップに',
+    // ビビッドオレンジを主役に、レモン・サンシャインで元気な印象に
+    accent: '#FF6B1A',
+    ink: '#3A2410',
+    frame: '#FFB300',
+    frameWidth: 2.2,
+    gridLine: '#FFC85C',
+    gridWidth: 2,
+    divider: '#FFDDA1',
+    cardBg: '#FFFFFF',
+    cardRadius: 18,
+    gridRadius: 14,
+    shadowBlur: 26,
+    shadowColor: 'rgba(255,120,30,0.20)',
+    seasonTint: true,
+    motif: true,
+    // 淡いレモンクリーム背景
+    plainBg: '#FFF4C2',
+    // 季節モチーフをビビッドオレンジ寄りに（彩度を保つため寄せる量は少なめ）
+    decoBlend: '#FF6B1A',
+    decoBlendAmt: 0.2,
+    decoAlpha: 1.15,
+    decoScale: 1.05,
+  },
 ]
 
 export function themeById(id: string | null | undefined): Theme {
