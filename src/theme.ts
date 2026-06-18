@@ -32,24 +32,24 @@ export const THEMES: Theme[] = [
   {
     id: 'soft',
     label: 'やわらか',
-    hint: '若葉を連想するアクアマリン背景。フレッシュで上品',
+    hint: '若葉を思わせる優しいミントクリーム背景。フレッシュで上品',
     accent: '#2E8F7E',
     ink: '#1F3D38',
-    // 背景の若葉アクアに合わせて、枠線・罫線・区切りも青緑寄りに揃える
+    // 背景のミントクリームに合わせて、枠線・罫線・区切りも青緑寄りに揃える
     frame: '#7BC7B3',
     frameWidth: 1.8,
-    gridLine: '#9AD6C5',
+    gridLine: '#A8D8C8',
     gridWidth: 1.6,
-    divider: '#BDE6D9',
+    divider: '#CFE9DF',
     cardBg: '#FFFFFF',
     cardRadius: 14,
     gridRadius: 10,
     shadowBlur: 20,
-    shadowColor: 'rgba(40,120,100,0.12)',
-    // 若葉を連想させるアクアマリン（CSS aquamarine）を背景に常時表示
+    shadowColor: 'rgba(40,120,100,0.10)',
+    // 落ち着いたミントクリーム（CSS mintcream より少し濃いめ）を常時背景に
     seasonTint: false,
     motif: true,
-    plainBg: '#7FFFD4',
+    plainBg: '#D6F2E4',
     // 季節モチーフは深めの若葉グリーンに寄せて、背景と馴染ませる
     decoBlend: '#2E8F7E',
     decoBlendAmt: 0.35,
