@@ -88,6 +88,27 @@ export function saveIntroSeen(): void {
   }
 }
 
+// ===== 初回「ブラウザで開く／ホーム画面に追加」お知らせの表示状態 =====
+// LINE/Instagram などのアプリ内ブラウザでは保存領域が一時的で、データが消える
+// ことがあるため、初回起動時にブラウザで開く・ホーム画面へ追加するよう促す。
+const INSTALL_NOTICE_KEY = 'calcreate:installNoticeSeen'
+
+export function loadInstallNoticeSeen(): boolean {
+  try {
+    return localStorage.getItem(INSTALL_NOTICE_KEY) === '1'
+  } catch {
+    return false
+  }
+}
+
+export function saveInstallNoticeSeen(): void {
+  try {
+    localStorage.setItem(INSTALL_NOTICE_KEY, '1')
+  } catch {
+    // 無視
+  }
+}
+
 // ===== ファイル保存・読み込み（バックアップ／別端末への移行・共有）=====
 interface BackupFile {
   app: 'calendarcreater'

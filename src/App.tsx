@@ -7,11 +7,13 @@ import {
   exportAll,
   importAll,
   loadFormatId,
+  loadInstallNoticeSeen,
   loadIntroSeen,
   loadMonth,
   loadPreviousMonth,
   loadThemeId,
   saveFormatId,
+  saveInstallNoticeSeen,
   saveIntroSeen,
   saveMonth,
   saveThemeId,
@@ -28,6 +30,33 @@ import {
 } from './types'
 
 const now = new Date()
+
+// 端末・閲覧環境の簡易判定。手順の出し分けと、アプリ内ブラウザ警告の強調に使う。
+type Platform = 'ios' | 'android' | 'pc' | 'unknown'
+function detectPlatform(): Platform {
+  if (typeof navigator === 'undefined') return 'unknown'
+  const ua = navigator.userAgent || ''
+  if (/iPad|iPhone|iPod/.test(ua)) return 'ios'
+  if (/Android/.test(ua)) return 'android'
+  if (/Windows|Macintosh|Linux/.test(ua)) return 'pc'
+  return 'unknown'
+}
+// LINE/Instagram/Facebook 等のアプリ内ブラウザ（WebView）かどうか。
+// これらは保存領域が一時的で、終了時にデータが消えることがあるため強く警告する。
+function detectInApp(): boolean {
+  if (typeof navigator === 'undefined') return false
+  const ua = navigator.userAgent || ''
+  return /Line|FBAN|FBAV|Instagram|TikTok|Twitter|KAKAOTALK|MicroMessenger/i.test(ua)
+}
+// すでにホーム画面から開かれている（スタンドアロン表示）か。
+function isStandalone(): boolean {
+  if (typeof window === 'undefined') return false
+  // iOS Safari
+  // @ts-expect-error: 非標準プロパティ
+  if (window.navigator.standalone) return true
+  if (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) return true
+  return false
+}
 
 function freshData(year: number, month: number): CalendarData {
   return {
@@ -61,6 +90,18 @@ export default function App() {
   const dismissIntro = () => {
     setShowIntro(false)
     saveIntroSeen()
+  }
+
+  // 初回「ブラウザで開く／ホーム画面に追加」お知らせ
+  // 既にホーム画面から起動済みなら出さない。
+  const [platform] = useState<Platform>(() => detectPlatform())
+  const [inApp] = useState<boolean>(() => detectInApp())
+  const [showInstall, setShowInstall] = useState(
+    () => !loadInstallNoticeSeen() && !isStandalone(),
+  )
+  const dismissInstall = () => {
+    setShowInstall(false)
+    saveInstallNoticeSeen()
   }
 
   // スマホ・小画面用：編集／プレビューを切り替えるタブ（上下スクロールの行き来を減らす）
@@ -277,6 +318,100 @@ export default function App() {
 
       {page === 'guide' && <Guide onBack={() => goPage('app')} />}
       {page === 'help' && <Help onBack={() => goPage('app')} />}
+
+      {showInstall && (
+        <div className="install-overlay" role="dialog" aria-modal="true" aria-labelledby="install-title">
+          <div className="install-modal">
+            <button className="install-close" onClick={dismissInstall} aria-label="このお知らせを閉じる">×</button>
+            <h2 id="install-title">⚠️ はじめにお読みください</h2>
+            <p className="install-lead">
+              入力したカレンダーは <strong>この端末のブラウザに保存</strong> されます。<br />
+              {inApp ? (
+                <>
+                  いま <strong>アプリ内ブラウザ（LINE・Instagram など）</strong> で開いています。
+                  このままだと <strong>アプリを閉じたときに入力が消えてしまうことがあります</strong>。
+                  必ず下のどちらかをしてから使ってください。
+                </>
+              ) : (
+                <>
+                  <strong>そのままページを閉じたり、別のアプリから開き直したりすると、入力した内容が消えてしまうことがあります。</strong>
+                  消えないようにするため、下のどちらかをしてから使ってください。
+                </>
+              )}
+            </p>
+
+            <div className="install-cards">
+              <div className="install-card">
+                <h3>🏠 ホーム画面に追加する（おすすめ）</h3>
+                <p className="install-card-lead">アプリのように開けて、入力したデータが消えにくくなります。</p>
+                {platform === 'ios' && (
+                  <ol>
+                    <li>画面下の <b>共有ボタン（□から↑が出ているマーク）</b> を押す</li>
+                    <li>メニューを少し下にスクロールして <b>「ホーム画面に追加」</b> を押す</li>
+                    <li>右上の <b>「追加」</b> を押す</li>
+                    <li>ホーム画面にできた <b>アイコンから開き直す</b></li>
+                  </ol>
+                )}
+                {platform === 'android' && (
+                  <ol>
+                    <li>画面右上の <b>「︙」メニュー</b> を押す</li>
+                    <li><b>「ホーム画面に追加」</b>（または「アプリをインストール」）を押す</li>
+                    <li>確認画面で <b>「追加」</b> を押す</li>
+                    <li>ホーム画面にできた <b>アイコンから開き直す</b></li>
+                  </ol>
+                )}
+                {(platform === 'pc' || platform === 'unknown') && (
+                  <ol>
+                    <li>ブラウザの <b>アドレスバー右側のアイコン</b>（インストール/＋）を押す</li>
+                    <li><b>「インストール」</b> を押す</li>
+                    <li>パソコンのアプリ一覧やデスクトップから開き直す</li>
+                  </ol>
+                )}
+              </div>
+
+              <div className="install-card">
+                <h3>🌐 ブラウザで開き直す</h3>
+                <p className="install-card-lead">
+                  {inApp
+                    ? 'LINE / Instagram 内ではなく、Safari や Chrome で開いてください。'
+                    : 'Safari や Chrome など、ふだん使っているブラウザで開いてください。'}
+                </p>
+                {platform === 'ios' && (
+                  <ol>
+                    <li>右下（または右上）の <b>「…」や共有ボタン</b> を押す</li>
+                    <li><b>「Safariで開く」</b> を選ぶ</li>
+                    <li>開いたページを <b>お気に入り／ブックマーク</b> に追加</li>
+                  </ol>
+                )}
+                {platform === 'android' && (
+                  <ol>
+                    <li>右上の <b>「︙」メニュー</b> を押す</li>
+                    <li><b>「ブラウザで開く」</b> または <b>「Chromeで開く」</b> を選ぶ</li>
+                    <li>開いたページを <b>ブックマーク</b> に追加</li>
+                  </ol>
+                )}
+                {(platform === 'pc' || platform === 'unknown') && (
+                  <ol>
+                    <li>このページの <b>URL をコピー</b></li>
+                    <li>Chrome や Safari などのブラウザに <b>貼り付けて開く</b></li>
+                    <li>開いたページを <b>ブックマーク</b> に追加</li>
+                  </ol>
+                )}
+              </div>
+            </div>
+
+            <p className="install-note">
+              ※ 万一に備えて、<b>「💾 ファイルに保存」</b> でバックアップも取っておくと安心です。
+            </p>
+
+            <div className="install-actions">
+              <button className="install-ok" onClick={dismissInstall}>
+                わかりました（次回から表示しない）
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {page === 'app' && showIntro && (
         <div className="intro" role="note">
