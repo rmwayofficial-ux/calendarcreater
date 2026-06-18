@@ -128,29 +128,30 @@ export const THEMES: Theme[] = [
   {
     id: 'pop',
     label: 'ビタミン',
-    hint: 'ビタミンカラーで元気いっぱい。明るくポップに',
-    // ビビッドオレンジを主役に、レモン・サンシャインで元気な印象に
-    accent: '#FF6B1A',
-    ink: '#3A2410',
-    frame: '#FFB300',
-    frameWidth: 2.2,
-    gridLine: '#FFC85C',
-    gridWidth: 2,
-    divider: '#FFDDA1',
+    hint: 'キリッとビビッド！原宿系ポップなビタミンカラー',
+    // 主役は鮮烈なホットピンク、罫線にゴールデンレモン、背景は元気なビビッドレモン。
+    // 影は無しでフラットに、枠線を太く取って「キリッとくっきりはっきり」を演出。
+    accent: '#FF1F8F',
+    ink: '#2A0E4A',
+    frame: '#FF1F8F',
+    frameWidth: 3,
+    gridLine: '#FFC700',
+    gridWidth: 2.4,
+    divider: '#FFE145',
     cardBg: '#FFFFFF',
-    cardRadius: 18,
-    gridRadius: 14,
-    shadowBlur: 26,
-    shadowColor: 'rgba(255,120,30,0.20)',
+    cardRadius: 14,
+    gridRadius: 8,
+    shadowBlur: 0,
+    shadowColor: 'rgba(0,0,0,0)',
     seasonTint: true,
     motif: true,
-    // 淡いレモンクリーム背景
-    plainBg: '#FFF4C2',
-    // 季節モチーフをビビッドオレンジ寄りに（彩度を保つため寄せる量は少なめ）
-    decoBlend: '#FF6B1A',
-    decoBlendAmt: 0.2,
-    decoAlpha: 1.15,
-    decoScale: 1.05,
+    // ビビッドレモン背景（季節色オフのとき）
+    plainBg: '#FFF066',
+    // 季節モチーフはほぼ無加工で彩度MAXのまま見せる
+    decoBlend: '#FF1F8F',
+    decoBlendAmt: 0.08,
+    decoAlpha: 1.35,
+    decoScale: 1.1,
   },
 ]
 
