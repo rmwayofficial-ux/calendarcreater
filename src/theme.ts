@@ -143,10 +143,11 @@ export const THEMES: Theme[] = [
     gridRadius: 8,
     shadowBlur: 0,
     shadowColor: 'rgba(0,0,0,0)',
-    seasonTint: true,
+    // 背景は季節色ではなく「常時ビビッドレモン」で原宿系のポップ感を最優先
+    seasonTint: false,
     motif: true,
-    // ビビッドレモン背景（季節色オフのとき）
-    plainBg: '#FFF066',
+    // 蛍光寄りのビビッドレモン。白カードが浮かぶ「ステッカー」感を狙う
+    plainBg: '#FFE94F',
     // 季節モチーフはほぼ無加工で彩度MAXのまま見せる
     decoBlend: '#FF1F8F',
     decoBlendAmt: 0.08,
