@@ -32,7 +32,7 @@ export const THEMES: Theme[] = [
   {
     id: 'soft',
     label: 'やわらか',
-    hint: 'ナチュラルで上品。生成りの背景に季節の色をほのかに',
+    hint: 'ナチュラルで上品。温かみのあるオートミール生成り背景',
     accent: '#3E7C74',
     ink: '#3B3A35',
     frame: '#CFC6B4',
@@ -45,9 +45,10 @@ export const THEMES: Theme[] = [
     gridRadius: 10,
     shadowBlur: 22,
     shadowColor: 'rgba(60,55,45,0.10)',
-    seasonTint: true,
+    // 季節依存をやめ、テーマ固有の「やわらかい生成り（オートミール）」で常に統一
+    seasonTint: false,
     motif: true,
-    plainBg: '#FBF8F2',
+    plainBg: '#F1E7D2',
     decoBlend: '#B8B0A2',
     decoBlendAmt: 0.45,
     decoAlpha: 1,
@@ -56,7 +57,7 @@ export const THEMES: Theme[] = [
   {
     id: 'sharp',
     label: 'クール',
-    hint: 'すっきりモダン（背景は季節の色のみ／イラストなし）',
+    hint: 'すっきりモダン。爽やかなクールミスト背景（イラストなし）',
     accent: '#3C6E78',
     ink: '#2C353C',
     frame: '#C8CFD2',
@@ -69,9 +70,10 @@ export const THEMES: Theme[] = [
     gridRadius: 4,
     shadowBlur: 0,
     shadowColor: 'rgba(0,0,0,0)',
-    seasonTint: true,
+    // 季節依存をやめ、テーマ固有の「クールミスト（淡い青みグレー）」で常に統一
+    seasonTint: false,
     motif: false,
-    plainBg: '#EEF1F2',
+    plainBg: '#DDE9EE',
     decoBlend: '#AEB6B8',
     decoBlendAmt: 0.4,
     decoAlpha: 1,
@@ -80,7 +82,7 @@ export const THEMES: Theme[] = [
   {
     id: 'plain',
     label: 'シャープ',
-    hint: '背景色は変わらない無地でクリア（毎月、月日だけが変わる）',
+    hint: 'シャープで明瞭。クリアなライトスレート背景（毎月同じ色）',
     accent: '#2F3A45',
     ink: '#26303A',
     frame: '#CACED3',
@@ -95,7 +97,8 @@ export const THEMES: Theme[] = [
     shadowColor: 'rgba(0,0,0,0)',
     seasonTint: false,
     motif: false,
-    plainBg: '#F3F4F6',
+    // ライトスレート（スレートグレー寄り）でシャープな明瞭感を出す
+    plainBg: '#E1E5EB',
     decoBlend: '#9AA2AA',
     decoBlendAmt: 0.4,
     decoAlpha: 1,
